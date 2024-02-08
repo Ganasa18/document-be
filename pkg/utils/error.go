@@ -15,3 +15,9 @@ func IsErrorDoPanic(e error) {
 		logrus.Panicln(e)
 	}
 }
+
+func PanicIfError(err error) {
+	if err != nil {
+		panic(err)
+	}
+}

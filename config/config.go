@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Ganasa18/document-be/internal/utils"
+	"github.com/Ganasa18/document-be/pkg/utils"
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 )

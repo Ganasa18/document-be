@@ -8,4 +8,6 @@ func (h *HttpServe) setupRouter() {
 	v1.GET("/hello", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "Hello, World!"})
 	})
+
+	v1.POST("/login-or-register", h.authController.LoginOrRegister)
 }

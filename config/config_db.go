@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Ganasa18/document-be/internal/utils"
+	"github.com/Ganasa18/document-be/pkg/utils"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -54,6 +54,8 @@ func NewDatabase(cfg *Config, config *gorm.Config) (*gorm.DB, error) {
 	if err != nil {
 		utils.IsErrorDoPanic(err)
 	}
+
+	// migrate create -ext sql -dir db/migrations create_table_first
 
 	return db, nil
 }
