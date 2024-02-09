@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/Ganasa18/document-be/internal/auth/model/domain"
@@ -10,6 +9,7 @@ import (
 	"github.com/Ganasa18/document-be/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator"
+	"github.com/google/uuid"
 )
 
 type AuthServiceImpl struct {
@@ -24,27 +24,39 @@ func NewAuthService(authRepository repository.AuthRepository, validate *validato
 	}
 }
 
-func toUserRegisterResponse(user domain.UserModel) web.UserRegisterRequest {
-	return web.UserRegisterRequest{
-		Email:    user.Email,
-		Password: user.Password,
-	}
-}
-
-func (service *AuthServiceImpl) LoginOrRegister(ctx *gin.Context, request web.UserRegisterRequest) web.UserRegisterRequest {
-	fmt.Println(request, "REQUEST")
+func (service *AuthServiceImpl) LoginOrRegister(ctx *gin.Context, request web.UserRegisterRequest) (web.UserRegisterResponse, error) {
 	err := service.Validate.Struct(request)
 	utils.PanicIfError(err)
+	var passwordData string
+
+	// if request.Password != "" {
+	// 	// Hashing the password with the default cost of 10
+	// 	hashedPassword, errHashedPassword := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
+	// 	utils.IsErrorDoPanic(errHashedPassword)
+
+	// 	passwordData = string(hashedPassword)
+	// }
+
+	// GENERATE UUID
+	uniqueID := uuid.New().String()
 
 	// LOGIC
+	OpenId := request.OpenId
 	register := domain.UserModel{
-		Email:     request.Email,
-		Password:  request.Password,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		UserUniqueId: uniqueID,
+		Email:        request.Email,
+		Password:     nil,
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
 	}
 
-	register = service.AuthRepository.LoginOrRegister(ctx, register)
-	return toUserRegisterResponse(register)
+	if request.Password != "" && OpenId != utils.OPEN_API_GOOGLE {
+		passwordData = request.Password
+		register.Password = &passwordData
+	}
+
+	data, err := service.AuthRepository.LoginOrRegister(ctx, register, OpenId)
+
+	return web.ToUserRegisterResponse(data, err)
 
 }

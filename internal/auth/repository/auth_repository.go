@@ -7,5 +7,5 @@ import (
 )
 
 type AuthRepository interface {
-	LoginOrRegister(ctx context.Context, user domain.UserModel) domain.UserModel
+	LoginOrRegister(ctx context.Context, user domain.UserModel, OpenId string) (domain.UserModel, error)
 }

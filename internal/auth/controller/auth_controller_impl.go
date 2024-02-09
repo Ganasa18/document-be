@@ -26,12 +26,23 @@ func (controller *AuthControllerImpl) LoginOrRegister(ctx *gin.Context) {
 
 	helper.ReadFromRequestBody(ctx.Request, &registerRequest)
 
-	registerResponse := controller.AuthService.LoginOrRegister(ctx, registerRequest)
+	registerResponse, err := controller.AuthService.LoginOrRegister(ctx, registerRequest)
+
+	var statusCode int
+	var responseData interface{}
+
+	if err != nil {
+		statusCode = http.StatusBadRequest
+		responseData = err.Error()
+	} else {
+		statusCode = http.StatusOK
+		responseData = registerResponse
+	}
 
 	webResponse := response.WebResponse{
-		Code:   200,
-		Status: "OK",
-		Data:   registerResponse,
+		Code:   statusCode,
+		Status: http.StatusText(statusCode),
+		Data:   responseData,
 	}
 
 	helper.WriteToResponseBody(ctx, http.StatusOK, webResponse)

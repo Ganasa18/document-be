@@ -6,5 +6,5 @@ import (
 )
 
 type AuthService interface {
-	LoginOrRegister(ctx *gin.Context, request web.UserRegisterRequest) web.UserRegisterRequest
+	LoginOrRegister(ctx *gin.Context, request web.UserRegisterRequest) (web.UserRegisterResponse, error)
 }

@@ -20,13 +20,12 @@ func NewDatabase(cfg *Config, config *gorm.Config) (*gorm.DB, error) {
 	}
 
 	dsn := fmt.Sprintf(
-		"host=%s port=%d user=%s password='%s' dbname=%s search_path=%s sslmode=disable TimeZone=%s",
+		"host=%s port=%d user=%s password='%s' dbname=%s sslmode=disable TimeZone=%s",
 		cfg.DbHost,
 		cfg.DbPort,
 		cfg.DbUsername,
 		cfg.DbPass,
 		cfg.DbName,
-		cfg.DbSchema,
 		tz,
 	)
 	sqlDB, err := sql.Open("pgx", dsn)
@@ -54,8 +53,6 @@ func NewDatabase(cfg *Config, config *gorm.Config) (*gorm.DB, error) {
 	if err != nil {
 		utils.IsErrorDoPanic(err)
 	}
-
-	// migrate create -ext sql -dir db/migrations create_table_first
 
 	return db, nil
 }
