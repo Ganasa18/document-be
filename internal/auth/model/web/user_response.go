@@ -20,6 +20,7 @@ type UserRegisterResponse struct {
 	Email        string     `json:"email"`
 	IsActive     bool       `json:"is_active"`
 	RoleId       *int       `json:"role_id"`
+	Token        *string    `json:"token"`
 	CreatedAt    time.Time  `json:"created_at"`
 	UpdatedAt    time.Time  `json:"updated_at"`
 	DeletedAt    *time.Time `json:"deleted_at"`

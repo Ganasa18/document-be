@@ -29,12 +29,16 @@ func (repository *AuthRepositoryImpl) LoginOrRegister(ctx context.Context, user 
 		plainPassword = *user.Password
 	}
 
-	err := repository.DB.Where(domain.UserModel{Email: user.Email}).First(&user).Error
-
+	err := repository.DB.Where(domain.UserModel{Email: user.Email, OpenId: user.OpenId}).First(&user).Error
 	// REGISTER USER
 	if err != nil {
 		fmt.Println("Error fetching the user:", err.Error())
 		if OpenId != utils.OPEN_API_GOOGLE {
+
+			if plainPassword == "" {
+				return user, errors.New("with email must have password")
+			}
+
 			// Hashing the password with the default cost of 10
 			hashedPassword, errHashedPassword := bcrypt.GenerateFromPassword([]byte(*user.Password), bcrypt.DefaultCost)
 			utils.IsErrorDoPanic(errHashedPassword)
@@ -50,6 +54,11 @@ func (repository *AuthRepositoryImpl) LoginOrRegister(ctx context.Context, user 
 	}
 
 	if OpenId != utils.OPEN_API_GOOGLE {
+
+		if plainPassword == "" {
+			return user, errors.New("authentication failed")
+		}
+
 		storedPasswordHash := *user.Password
 		// Compare passwords
 		err = bcrypt.CompareHashAndPassword([]byte(storedPasswordHash), []byte(plainPassword))

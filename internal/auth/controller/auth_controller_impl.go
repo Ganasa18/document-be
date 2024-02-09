@@ -7,6 +7,7 @@ import (
 	"github.com/Ganasa18/document-be/internal/auth/service"
 	response "github.com/Ganasa18/document-be/internal/base/model/web"
 	"github.com/Ganasa18/document-be/pkg/helper"
+	"github.com/Ganasa18/document-be/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -36,6 +37,10 @@ func (controller *AuthControllerImpl) LoginOrRegister(ctx *gin.Context) {
 		responseData = err.Error()
 	} else {
 		statusCode = http.StatusOK
+		// SET ASSIGN JWT TOKEN
+		tokenString, err := helper.CreateToken(registerResponse.UserUniqueId, registerResponse.Email)
+		utils.PanicIfError(err)
+		registerResponse.Token = &tokenString
 		responseData = registerResponse
 	}
 
@@ -45,6 +50,6 @@ func (controller *AuthControllerImpl) LoginOrRegister(ctx *gin.Context) {
 		Data:   responseData,
 	}
 
-	helper.WriteToResponseBody(ctx, http.StatusOK, webResponse)
+	helper.WriteToResponseBody(ctx, statusCode, webResponse)
 
 }

@@ -8,6 +8,8 @@ require (
 	gorm.io/gorm v1.25.7
 )
 
+require github.com/golang-jwt/jwt/v5 v5.2.0
+
 require (
 	github.com/bytedance/sonic v1.10.2 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d // indirect

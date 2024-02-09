@@ -1,0 +1,1 @@
+ALTER TABLE ms_users ADD CONSTRAINT unique_email UNIQUE (email);

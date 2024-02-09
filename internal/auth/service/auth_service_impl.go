@@ -1,6 +1,8 @@
 package service
 
 import (
+	"errors"
+	"fmt"
 	"time"
 
 	"github.com/Ganasa18/document-be/internal/auth/model/domain"
@@ -29,14 +31,6 @@ func (service *AuthServiceImpl) LoginOrRegister(ctx *gin.Context, request web.Us
 	utils.PanicIfError(err)
 	var passwordData string
 
-	// if request.Password != "" {
-	// 	// Hashing the password with the default cost of 10
-	// 	hashedPassword, errHashedPassword := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
-	// 	utils.IsErrorDoPanic(errHashedPassword)
-
-	// 	passwordData = string(hashedPassword)
-	// }
-
 	// GENERATE UUID
 	uniqueID := uuid.New().String()
 
@@ -46,13 +40,19 @@ func (service *AuthServiceImpl) LoginOrRegister(ctx *gin.Context, request web.Us
 		UserUniqueId: uniqueID,
 		Email:        request.Email,
 		Password:     nil,
+		OpenId:       request.OpenId,
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
 	}
 
-	if request.Password != "" && OpenId != utils.OPEN_API_GOOGLE {
-		passwordData = request.Password
-		register.Password = &passwordData
+	if register.Password == nil && OpenId != utils.OPEN_API_GOOGLE {
+		fmt.Println("Error creating user:", request)
+		if request.Password != "" {
+			passwordData = request.Password
+			register.Password = &passwordData
+		} else {
+			return web.UserRegisterResponse{}, errors.New("password must be provided")
+		}
 	}
 
 	data, err := service.AuthRepository.LoginOrRegister(ctx, register, OpenId)

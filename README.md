@@ -5,7 +5,7 @@ Document builder backend
 ## Requirement
 
 1. GoLang version >= 1.22
-2. GORM version >= v1.25.5 [gorm docs](https://gorm.io/docs/index.html)
+2. GORM version >= v1.25.7 [gorm docs](https://gorm.io/docs/index.html)
 3. Gin-gonic version >= v1.9.1 [gin docs](https://gin-gonic.com/docs/quickstart/)
 
 ## Installation
