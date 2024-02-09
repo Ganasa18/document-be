@@ -5,6 +5,7 @@ import "time"
 type UserModel struct {
 	Id           int        `json:"id"`
 	UserUniqueId string     `json:"user_unique_id"`
+	OpenId       string     `json:"open_id"`
 	Username     string     `json:"username"`
 	Email        string     `json:"email"`
 	Password     *string    `json:"password"`

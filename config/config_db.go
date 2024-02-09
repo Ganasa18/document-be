@@ -55,4 +55,7 @@ func NewDatabase(cfg *Config, config *gorm.Config) (*gorm.DB, error) {
 	}
 
 	return db, nil
+
+	// migrate create -ext sql -dir scripts/migrations create_table_first
+	// migrate -database "postgres://postgres:admin@localhost:5432/db_document_builder?sslmode=disable" -path db/migrations up
 }
