@@ -9,4 +9,5 @@ type RoleController interface {
 	GetRoleById(ctx *gin.Context)
 	CreateRole(ctx *gin.Context)
 	UpdateRole(ctx *gin.Context)
+	DeleteRole(ctx *gin.Context)
 }

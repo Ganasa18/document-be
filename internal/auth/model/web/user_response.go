@@ -5,6 +5,7 @@ import (
 
 	"github.com/Ganasa18/document-be/internal/auth/model/domain"
 	role "github.com/Ganasa18/document-be/internal/crud/model/web"
+	"gorm.io/gorm"
 )
 
 type UserRegisterRequest struct {
@@ -25,7 +26,7 @@ type UserRegisterResponse struct {
 	Token        *string                     `json:"token"`
 	CreatedAt    time.Time                   `json:"created_at"`
 	UpdatedAt    time.Time                   `json:"updated_at"`
-	DeletedAt    *time.Time                  `json:"deleted_at"`
+	DeletedAt    *gorm.DeletedAt             `json:"deleted_at"`
 }
 
 func ToUserRegisterResponse(user domain.UserModel, errorData error) (UserRegisterResponse, error) {

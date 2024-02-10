@@ -66,6 +66,25 @@ func (repository *RoleRepositoryImpl) UpdateRole(ctx context.Context, role domai
 	return role, err
 }
 
+func (repository *RoleRepositoryImpl) DeleteRole(ctx context.Context, id int) error {
+	role := &domain.RoleMasterModel{Id: id}
+
+	err := repository.DB.First(&domain.RoleMasterModel{}, id).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return errors.New("role not found")
+	}
+
+	err = repository.DB.Delete(role).Error
+
+	if err != nil {
+		loghelper.Errorln(ctx, fmt.Sprintf("DeleteRole | Error when deleting role, err: %s", err.Error()))
+		return errors.New("failed to delete role")
+	}
+
+	return nil
+}
+
 func (repository *RoleRepositoryImpl) GetRoleById(ctx context.Context, id int) (role domain.RoleMasterModel, err error) {
 	err = repository.DB.Model(&domain.RoleMasterModel{}).First(&role, id).Error
 	if err != nil {

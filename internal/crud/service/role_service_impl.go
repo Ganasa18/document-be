@@ -66,6 +66,15 @@ func (service *RoleServiceImpl) UpdateRole(ctx *gin.Context, request web.RoleMas
 	return web.ToRoleMasterResponseWithError(roleResponse, err)
 }
 
+func (service *RoleServiceImpl) DeleteRole(ctx *gin.Context) error {
+	roleId := ctx.Params.ByName("roleId")
+	id, err := strconv.Atoi(roleId)
+	utils.PanicIfError(err)
+	err = service.RoleRepository.DeleteRole(ctx, id)
+
+	return err
+}
+
 func (service *RoleServiceImpl) GetRoleById(ctx *gin.Context) web.RoleMasterResponse {
 	roleId := ctx.Params.ByName("roleId")
 	id, err := strconv.Atoi(roleId)

@@ -12,4 +12,5 @@ type RoleRepository interface {
 	GetRoleById(ctx context.Context, id int) (domain.RoleMasterModel, error)
 	CreateRole(ctx context.Context, role domain.RoleMasterModel) (domain.RoleMasterModel, error)
 	UpdateRole(ctx context.Context, role domain.RoleMasterModel, id int) (domain.RoleMasterModel, error)
+	DeleteRole(ctx context.Context, id int) error
 }

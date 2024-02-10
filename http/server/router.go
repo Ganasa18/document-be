@@ -14,5 +14,6 @@ func (h *HttpServe) setupRouter() {
 	v1.GET("/crud/role/:roleId", h.roleController.GetRoleById)
 	v1.POST("/crud/role", h.roleController.CreateRole)
 	v1.PATCH("/crud/role/:roleId", h.roleController.UpdateRole)
+	v1.DELETE("/crud/role/:roleId", h.roleController.DeleteRole)
 
 }

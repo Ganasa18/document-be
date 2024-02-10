@@ -11,4 +11,5 @@ type RoleService interface {
 	GetRoleById(ctx *gin.Context) web.RoleMasterResponse
 	CreateRole(ctx *gin.Context, request web.RoleMasterRequest) (web.RoleMasterResponse, error)
 	UpdateRole(ctx *gin.Context, request web.RoleMasterRequest) (web.RoleMasterResponse, error)
+	DeleteRole(ctx *gin.Context) error
 }

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/Ganasa18/document-be/internal/crud/model/domain"
+	"gorm.io/gorm"
 )
 
 type UserModel struct {
@@ -18,7 +19,7 @@ type UserModel struct {
 	RoleMasterModel domain.RoleMasterModel `gorm:"foreignKey:RoleId"`
 	CreatedAt       time.Time              `json:"created_at"`
 	UpdatedAt       time.Time              `json:"updated_at"`
-	DeletedAt       *time.Time             `json:"deleted_at"`
+	DeletedAt       gorm.DeletedAt         `json:"deleted_at"`
 }
 
 func (UserModel) TableName() string {

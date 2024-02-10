@@ -74,6 +74,30 @@ func (controller *RoleControllerImpl) UpdateRole(ctx *gin.Context) {
 	helper.WriteToResponseBody(ctx, statusCode, webResponse)
 }
 
+// DeleteRole implements RoleController.
+func (controller *RoleControllerImpl) DeleteRole(ctx *gin.Context) {
+	err := controller.RoleService.DeleteRole(ctx)
+
+	var statusCode int
+	var responseData interface{}
+
+	if err != nil {
+		statusCode = http.StatusBadRequest
+		responseData = err.Error()
+	} else {
+		statusCode = http.StatusOK
+		responseData = "success deleted"
+	}
+
+	webResponse := response.WebResponse{
+		Code:   statusCode,
+		Status: http.StatusText(statusCode),
+		Data:   responseData,
+	}
+
+	helper.WriteToResponseBody(ctx, statusCode, webResponse)
+}
+
 func (controller *RoleControllerImpl) GetRoleById(ctx *gin.Context) {
 
 	roleResponse := controller.RoleService.GetRoleById(ctx)
