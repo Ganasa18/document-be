@@ -14,8 +14,8 @@ type WebResponsePaginate struct {
 }
 
 type PageInfoResponse struct {
-	Total       int `json:"total"`
-	PerPage     int `json:"per_page"`
-	CurrentPage int `json:"current_page"`
-	TotalPage   int `json:"total_page"`
+	Total       int64 `json:"total"`
+	PerPage     int   `json:"per_page"`
+	CurrentPage int   `json:"current_page"`
+	TotalPage   int   `json:"total_page"`
 }

@@ -7,6 +7,7 @@ const (
 	HEADER_CONTENT_TYPE           = "Content-Type"
 	CONTENT_TYPE_APPLICATION_JSON = "application/json"
 	OPEN_API_GOOGLE               = "google"
+	HEADER_AUTHORIZATION          = "Authorization"
 
 	CONFIG_APP_URL     = "APP_URL"
 	CONFIG_APP_ENV     = "APP_ENV"

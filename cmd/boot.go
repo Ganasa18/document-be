@@ -3,9 +3,6 @@ package cmd
 import (
 	appconfig "github.com/Ganasa18/document-be/config"
 	"github.com/Ganasa18/document-be/http/server"
-	"github.com/Ganasa18/document-be/internal/auth/controller"
-	"github.com/Ganasa18/document-be/internal/auth/repository"
-	"github.com/Ganasa18/document-be/internal/auth/service"
 	"github.com/Ganasa18/document-be/pkg/utils"
 	"github.com/go-playground/validator"
 	"gorm.io/gorm"
@@ -20,16 +17,14 @@ func initHTTP() error {
 	validate := validator.New()
 
 	// auth definition
-	authRepo := repository.NewAuthRepository(db)
-	authSvc := service.NewAuthService(authRepo, validate)
-	authController := controller.NewAuthController(authSvc)
+	authCtrl, roleCtrl := server.InitializeModel(db, validate)
 
 	if err != nil {
 		utils.IsErrorDoPanic(err)
 	}
 
 	// run server
-	err = server.RunHttpServer(appConf, authController)
+	err = server.RunHttpServer(appConf, authCtrl, roleCtrl)
 	if err != nil {
 		utils.IsErrorDoPanic(err)
 	}

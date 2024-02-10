@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/Ganasa18/document-be/internal/auth/model/domain"
@@ -47,7 +46,6 @@ func (service *AuthServiceImpl) LoginOrRegister(ctx *gin.Context, request web.Us
 	}
 
 	if register.Password == nil && OpenId != utils.OPEN_API_GOOGLE {
-		fmt.Println("Error creating user:", request)
 		if request.Password != "" {
 			passwordData = request.Password
 			register.Password = &passwordData

@@ -1,13 +1,15 @@
 package server
 
-import "github.com/gin-gonic/gin"
+import "github.com/Ganasa18/document-be/pkg/middleware"
 
 func (h *HttpServe) setupRouter() {
 	v1 := h.router.Group("/api/v1")
-
-	v1.GET("/hello", func(c *gin.Context) {
-		c.JSON(200, gin.H{"message": "Hello, World!"})
-	})
-
+	// AUTH
 	v1.POST("/login-or-register", h.authController.LoginOrRegister)
+
+	// WITH AUTHORZATION
+	v1.Use(middleware.CustomAuthMiddleware())
+	// CRUD MASTER
+	v1.GET("/crud/role", h.roleController.GetRoles)
+
 }

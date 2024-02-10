@@ -2,7 +2,8 @@ package server
 
 import (
 	appconfig "github.com/Ganasa18/document-be/config"
-	"github.com/Ganasa18/document-be/internal/auth/controller"
+	authController "github.com/Ganasa18/document-be/internal/auth/controller"
+	crudController "github.com/Ganasa18/document-be/internal/crud/controller"
 	"github.com/Ganasa18/document-be/pkg/exception"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -10,10 +11,11 @@ import (
 
 type HttpServe struct {
 	router         *gin.Engine
-	authController controller.AuthController
+	authController authController.AuthController
+	roleController crudController.RoleController
 }
 
-func RunHttpServer(appConf *appconfig.Config, authController controller.AuthController) error {
+func RunHttpServer(appConf *appconfig.Config, authController authController.AuthController, roleController crudController.RoleController) error {
 	var hs HttpServe
 
 	hs.router = gin.New()
@@ -31,6 +33,7 @@ func RunHttpServer(appConf *appconfig.Config, authController controller.AuthCont
 	hs.router.SetTrustedProxies([]string{appConf.AppUrl})
 
 	hs.authController = authController
+	hs.roleController = roleController
 	hs.setupRouter()
 
 	return hs.router.Run(appConf.AppUrl + ":" + appConf.AppPort)
