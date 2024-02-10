@@ -8,4 +8,7 @@ import (
 
 type RoleService interface {
 	GetRoles(ctx *gin.Context, pagination *helper.PaginationInput) ([]web.RoleMasterResponse, int64, error)
+	GetRoleById(ctx *gin.Context) web.RoleMasterResponse
+	CreateRole(ctx *gin.Context, request web.RoleMasterRequest) (web.RoleMasterResponse, error)
+	UpdateRole(ctx *gin.Context, request web.RoleMasterRequest) (web.RoleMasterResponse, error)
 }

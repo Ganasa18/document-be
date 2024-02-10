@@ -4,11 +4,9 @@ import (
 	"time"
 
 	"github.com/Ganasa18/document-be/internal/crud/model/domain"
-	"gorm.io/gorm"
 )
 
 type UserModel struct {
-	gorm.Model
 	Id              int                    `json:"id" gorm:"primaryKey"`
 	UserUniqueId    string                 `json:"user_unique_id"`
 	OpenId          string                 `json:"open_id"`

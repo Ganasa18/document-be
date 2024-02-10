@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	response "github.com/Ganasa18/document-be/internal/base/model/web"
+	"github.com/Ganasa18/document-be/internal/crud/model/web"
 	"github.com/Ganasa18/document-be/internal/crud/service"
 	"github.com/Ganasa18/document-be/pkg/helper"
 	"github.com/gin-gonic/gin"
@@ -18,6 +19,73 @@ func NewRoleController(roleService service.RoleService) RoleController {
 	return &RoleControllerImpl{
 		RoleService: roleService,
 	}
+}
+
+func (controller *RoleControllerImpl) CreateRole(ctx *gin.Context) {
+	roleRequest := web.RoleMasterRequest{}
+	helper.ReadFromRequestBody(ctx.Request, &roleRequest)
+
+	roleResponse, err := controller.RoleService.CreateRole(ctx, roleRequest)
+
+	var statusCode int
+	var responseData interface{}
+
+	if err != nil {
+		statusCode = http.StatusBadRequest
+		responseData = err.Error()
+	} else {
+		statusCode = http.StatusOK
+		responseData = roleResponse
+	}
+
+	webResponse := response.WebResponse{
+		Code:   statusCode,
+		Status: http.StatusText(statusCode),
+		Data:   responseData,
+	}
+
+	helper.WriteToResponseBody(ctx, statusCode, webResponse)
+
+}
+
+func (controller *RoleControllerImpl) UpdateRole(ctx *gin.Context) {
+	roleRequest := web.RoleMasterRequest{}
+	helper.ReadFromRequestBody(ctx.Request, &roleRequest)
+
+	roleResponse, err := controller.RoleService.UpdateRole(ctx, roleRequest)
+
+	var statusCode int
+	var responseData interface{}
+
+	if err != nil {
+		statusCode = http.StatusBadRequest
+		responseData = err.Error()
+	} else {
+		statusCode = http.StatusOK
+		responseData = roleResponse
+	}
+
+	webResponse := response.WebResponse{
+		Code:   statusCode,
+		Status: http.StatusText(statusCode),
+		Data:   responseData,
+	}
+
+	helper.WriteToResponseBody(ctx, statusCode, webResponse)
+}
+
+func (controller *RoleControllerImpl) GetRoleById(ctx *gin.Context) {
+
+	roleResponse := controller.RoleService.GetRoleById(ctx)
+
+	webResponse := response.WebResponse{
+		Code:   http.StatusOK,
+		Status: http.StatusText(http.StatusOK),
+		Data:   roleResponse,
+	}
+
+	helper.WriteToResponseBody(ctx, http.StatusOK, webResponse)
+
 }
 
 func (controller *RoleControllerImpl) GetRoles(ctx *gin.Context) {

@@ -42,6 +42,8 @@ func ToUserRegisterResponse(user domain.UserModel, errorData error) (UserRegiste
 		Email:        user.Email,
 		Username:     user.Username,
 		Role:         userRole,
+		CreatedAt:    user.CreatedAt,
+		UpdatedAt:    user.UpdatedAt,
 	}
 
 	return loginResponse, errorData

@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/Ganasa18/document-be/internal/auth/model/domain"
+	"github.com/Ganasa18/document-be/pkg/loghelper"
 	"github.com/Ganasa18/document-be/pkg/utils"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -21,9 +22,7 @@ func NewAuthRepository(db *gorm.DB) AuthRepository {
 	}
 }
 
-// LoginOrRegister implements AuthRepository.
 func (repository *AuthRepositoryImpl) LoginOrRegister(ctx context.Context, user domain.UserModel, OpenId string) (domain.UserModel, error) {
-	// Check if the user with the given email already exists or create the user
 	var plainPassword string
 	if OpenId != utils.OPEN_API_GOOGLE {
 		plainPassword = *user.Password
@@ -36,7 +35,7 @@ func (repository *AuthRepositoryImpl) LoginOrRegister(ctx context.Context, user 
 
 	// REGISTER USER
 	if err != nil {
-		fmt.Println("Error fetching the user:", err.Error())
+		loghelper.Errorln(ctx, fmt.Sprintf("LoginOrRegister | Error fetching the user, err:%s", err.Error()))
 		if OpenId != utils.OPEN_API_GOOGLE {
 
 			if plainPassword == "" {
@@ -51,7 +50,7 @@ func (repository *AuthRepositoryImpl) LoginOrRegister(ctx context.Context, user 
 		}
 		err = repository.DB.Create(&user).Error
 		if err != nil {
-			fmt.Println("Error creating user:", err.Error())
+			loghelper.Errorln(ctx, fmt.Sprintf("LoginOrRegister | Error creating user, err:%s", err.Error()))
 			return user, err
 		}
 		return user, nil
@@ -67,7 +66,6 @@ func (repository *AuthRepositoryImpl) LoginOrRegister(ctx context.Context, user 
 		// Compare passwords
 		err = bcrypt.CompareHashAndPassword([]byte(storedPasswordHash), []byte(plainPassword))
 		if err == bcrypt.ErrMismatchedHashAndPassword {
-			// Handle the case where authentication failed
 			return user, errors.New("authentication failed")
 		}
 	}

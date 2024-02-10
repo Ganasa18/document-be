@@ -6,4 +6,7 @@ import (
 
 type RoleController interface {
 	GetRoles(ctx *gin.Context)
+	GetRoleById(ctx *gin.Context)
+	CreateRole(ctx *gin.Context)
+	UpdateRole(ctx *gin.Context)
 }

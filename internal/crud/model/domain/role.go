@@ -2,12 +2,9 @@ package domain
 
 import (
 	"time"
-
-	"gorm.io/gorm"
 )
 
 type RoleMasterModel struct {
-	gorm.Model
 	Id        int        `json:"id"`
 	RoleName  string     `json:"role_name"`
 	CreatedAt time.Time  `json:"created_at"`

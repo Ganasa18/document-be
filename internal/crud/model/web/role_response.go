@@ -14,8 +14,8 @@ type RoleMasterResponse struct {
 	DeletedAt *time.Time `json:"deleted_at"`
 }
 
-type RoleMasterCreateRequest struct {
-	RoleName string `validate:"required,min:1" json:"role_name"`
+type RoleMasterRequest struct {
+	RoleName string `validate:"required,min=1" json:"role_name"`
 }
 
 type RoleMasterResponseJoin struct {
@@ -23,13 +23,28 @@ type RoleMasterResponseJoin struct {
 	RoleName string `json:"role_name"`
 }
 
-func ToRoleMasterResponse(role domain.RoleMasterModel) RoleMasterResponse {
-	return RoleMasterResponse{
+func ToRoleMasterResponseWithError(role domain.RoleMasterModel, err error) (RoleMasterResponse, error) {
+	var roleResponse = RoleMasterResponse{
 		Id:        role.Id,
 		RoleName:  role.RoleName,
 		CreatedAt: role.CreatedAt,
+		UpdatedAt: role.UpdatedAt,
 		DeletedAt: role.DeletedAt,
 	}
+
+	return roleResponse, err
+}
+
+func ToRoleMasterResponse(role domain.RoleMasterModel) RoleMasterResponse {
+	var roleResponse = RoleMasterResponse{
+		Id:        role.Id,
+		RoleName:  role.RoleName,
+		CreatedAt: role.CreatedAt,
+		UpdatedAt: role.UpdatedAt,
+		DeletedAt: role.DeletedAt,
+	}
+
+	return roleResponse
 }
 
 func ToRoleMasterResponses(roles []domain.RoleMasterModel, totalRow int64, err error) ([]RoleMasterResponse, int64, error) {
