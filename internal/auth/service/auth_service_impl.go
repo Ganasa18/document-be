@@ -41,6 +41,7 @@ func (service *AuthServiceImpl) LoginOrRegister(ctx *gin.Context, request web.Us
 		Email:        request.Email,
 		Password:     nil,
 		OpenId:       request.OpenId,
+		Username:     request.Username,
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
 	}

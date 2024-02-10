@@ -7,9 +7,10 @@ import (
 )
 
 type UserRegisterRequest struct {
-	Email    string `validate:"required,email" json:"email"`
-	Password string `json:"password"`
-	OpenId   string `validate:"required" json:"open_id"`
+	Email    string  `validate:"required,email" json:"email"`
+	Password string  `json:"password"`
+	OpenId   string  `validate:"required" json:"open_id"`
+	Username *string `json:"username"`
 }
 
 type UserRegisterResponse struct {
@@ -29,8 +30,10 @@ type UserRegisterResponse struct {
 func ToUserRegisterResponse(user domain.UserModel, errorData error) (UserRegisterResponse, error) {
 	loginResponse := UserRegisterResponse{
 		Id:           user.Id,
+		OpenId:       user.OpenId,
 		UserUniqueId: user.UserUniqueId,
 		Email:        user.Email,
+		Username:     user.Username,
 		CreatedAt:    user.CreatedAt,
 		UpdatedAt:    user.UpdatedAt,
 		DeletedAt:    user.DeletedAt,
