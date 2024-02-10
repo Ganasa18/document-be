@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"time"
 
 	"github.com/Ganasa18/document-be/internal/auth/model/domain"
 	"github.com/Ganasa18/document-be/internal/auth/model/web"
@@ -33,6 +32,8 @@ func (service *AuthServiceImpl) LoginOrRegister(ctx *gin.Context, request web.Us
 	// GENERATE UUID
 	uniqueID := uuid.New().String()
 
+	roleDefault := 1
+
 	// LOGIC
 	OpenId := request.OpenId
 	register := domain.UserModel{
@@ -40,9 +41,8 @@ func (service *AuthServiceImpl) LoginOrRegister(ctx *gin.Context, request web.Us
 		Email:        request.Email,
 		Password:     nil,
 		OpenId:       request.OpenId,
+		RoleId:       &roleDefault,
 		Username:     request.Username,
-		CreatedAt:    time.Now(),
-		UpdatedAt:    time.Now(),
 	}
 
 	if register.Password == nil && OpenId != utils.OPEN_API_GOOGLE {

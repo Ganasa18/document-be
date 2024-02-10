@@ -18,6 +18,11 @@ type RoleMasterCreateRequest struct {
 	RoleName string `validate:"required,min:1" json:"role_name"`
 }
 
+type RoleMasterResponseJoin struct {
+	Id       int    `json:"id"`
+	RoleName string `json:"role_name"`
+}
+
 func ToRoleMasterResponse(role domain.RoleMasterModel) RoleMasterResponse {
 	return RoleMasterResponse{
 		Id:        role.Id,

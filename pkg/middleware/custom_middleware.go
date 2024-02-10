@@ -28,6 +28,7 @@ func CustomAuthMiddleware() gin.HandlerFunc {
 
 		authSplited := strings.Split(providedToken, " ")
 
+		// CHECK HANDLER IF AUTHORIZATION HEADER NOT HAVE BEARER
 		if authSplited[0] != "Bearer" {
 			webResponse := web.WebResponse{
 				Code:   http.StatusUnauthorized,
@@ -39,6 +40,7 @@ func CustomAuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		// CHECK LENGTH AUTHORIZATION
 		if len(authSplited) < 2 || len(authSplited) > 2 {
 			webResponse := web.WebResponse{
 				Code:   http.StatusUnauthorized,
@@ -52,7 +54,7 @@ func CustomAuthMiddleware() gin.HandlerFunc {
 
 		tokenValid, _ := helper.ValidateToken(authSplited[1])
 
-		// CHECK HANDLER TOKEN INVALID
+		// CHECK TOKEN VALID
 		if tokenValid == nil {
 			webResponse := web.WebResponse{
 				Code:   http.StatusUnauthorized,

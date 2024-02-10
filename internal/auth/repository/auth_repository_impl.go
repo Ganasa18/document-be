@@ -30,6 +30,10 @@ func (repository *AuthRepositoryImpl) LoginOrRegister(ctx context.Context, user 
 	}
 
 	err := repository.DB.Where(domain.UserModel{Email: user.Email, OpenId: user.OpenId}).First(&user).Error
+
+	// GET USER ROLE
+	_ = repository.DB.Where(domain.UserModel{Email: user.Email}).Preload("RoleMasterModel").Find(&user).Error
+
 	// REGISTER USER
 	if err != nil {
 		fmt.Println("Error fetching the user:", err.Error())

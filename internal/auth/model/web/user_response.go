@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/Ganasa18/document-be/internal/auth/model/domain"
+	role "github.com/Ganasa18/document-be/internal/crud/model/web"
 )
 
 type UserRegisterRequest struct {
@@ -14,29 +15,33 @@ type UserRegisterRequest struct {
 }
 
 type UserRegisterResponse struct {
-	Id           int        `json:"id"`
-	OpenId       string     `json:"open_id"`
-	UserUniqueId string     `json:"user_unique_id"`
-	Username     *string    `json:"username"`
-	Email        string     `json:"email"`
-	IsActive     bool       `json:"is_active"`
-	RoleId       *int       `json:"role_id"`
-	Token        *string    `json:"token"`
-	CreatedAt    time.Time  `json:"created_at"`
-	UpdatedAt    time.Time  `json:"updated_at"`
-	DeletedAt    *time.Time `json:"deleted_at"`
+	Id           int                         `json:"id"`
+	OpenId       string                      `json:"open_id"`
+	UserUniqueId string                      `json:"user_unique_id"`
+	Username     *string                     `json:"username"`
+	Email        string                      `json:"email"`
+	IsActive     bool                        `json:"is_active"`
+	Role         role.RoleMasterResponseJoin `json:"role"`
+	Token        *string                     `json:"token"`
+	CreatedAt    time.Time                   `json:"created_at"`
+	UpdatedAt    time.Time                   `json:"updated_at"`
+	DeletedAt    *time.Time                  `json:"deleted_at"`
 }
 
 func ToUserRegisterResponse(user domain.UserModel, errorData error) (UserRegisterResponse, error) {
+
+	userRole := role.RoleMasterResponseJoin{
+		Id:       user.RoleMasterModel.Id,
+		RoleName: user.RoleMasterModel.RoleName,
+	}
+
 	loginResponse := UserRegisterResponse{
 		Id:           user.Id,
 		OpenId:       user.OpenId,
 		UserUniqueId: user.UserUniqueId,
 		Email:        user.Email,
 		Username:     user.Username,
-		CreatedAt:    user.CreatedAt,
-		UpdatedAt:    user.UpdatedAt,
-		DeletedAt:    user.DeletedAt,
+		Role:         userRole,
 	}
 
 	return loginResponse, errorData
