@@ -53,3 +53,31 @@ func (controller *AuthControllerImpl) LoginOrRegister(ctx *gin.Context) {
 	helper.WriteToResponseBody(ctx, statusCode, webResponse)
 
 }
+
+func (controller *AuthControllerImpl) ForgotLinkPassword(ctx *gin.Context) {
+
+	forgotRequest := web.ForgotPasswordRequest{}
+
+	helper.ReadFromRequestBody(ctx.Request, &forgotRequest)
+
+	err := controller.AuthService.ForgotLinkPassword(ctx, forgotRequest)
+
+	var statusCode int
+	var responseData interface{}
+
+	if err != nil {
+		statusCode = http.StatusBadRequest
+		responseData = err.Error()
+	} else {
+		statusCode = http.StatusOK
+		responseData = "success send link"
+	}
+
+	webResponse := response.WebResponse{
+		Code:   statusCode,
+		Status: http.StatusText(statusCode),
+		Data:   responseData,
+	}
+
+	helper.WriteToResponseBody(ctx, statusCode, webResponse)
+}

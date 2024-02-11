@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	UserModel "github.com/Ganasa18/document-be/internal/auth/model/domain"
+	AuthModel "github.com/Ganasa18/document-be/internal/auth/model/domain"
 	RoleModel "github.com/Ganasa18/document-be/internal/crud/model/domain"
 	"github.com/Ganasa18/document-be/pkg/utils"
 	"gorm.io/driver/postgres"
@@ -15,7 +15,7 @@ import (
 )
 
 func NewDatabase(cfg *Config, config *gorm.Config) (*gorm.DB, error) {
-	tz := "Asia/Jakarta"
+	timeZone := "Asia/Jakarta"
 
 	if config == nil {
 		config = &gorm.Config{}
@@ -28,7 +28,7 @@ func NewDatabase(cfg *Config, config *gorm.Config) (*gorm.DB, error) {
 		cfg.DbUsername,
 		cfg.DbPass,
 		cfg.DbName,
-		tz,
+		timeZone,
 	)
 	sqlDB, err := sql.Open("pgx", dsn)
 	utils.IsErrorDoPanic(err)
@@ -56,7 +56,7 @@ func NewDatabase(cfg *Config, config *gorm.Config) (*gorm.DB, error) {
 		utils.IsErrorDoPanic(err)
 	}
 
-	db.AutoMigrate(&UserModel.UserModel{}, &RoleModel.RoleMasterModel{})
+	db.AutoMigrate(&AuthModel.UserModel{}, AuthModel.ForgotPasswordLink{}, &RoleModel.RoleMasterModel{})
 
 	return db, nil
 

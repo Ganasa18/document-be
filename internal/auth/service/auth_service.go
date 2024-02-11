@@ -7,4 +7,5 @@ import (
 
 type AuthService interface {
 	LoginOrRegister(ctx *gin.Context, request web.UserRegisterRequest) (web.UserRegisterResponse, error)
+	ForgotLinkPassword(ctx *gin.Context, request web.ForgotPasswordRequest) error
 }

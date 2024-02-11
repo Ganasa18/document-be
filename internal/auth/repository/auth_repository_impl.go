@@ -73,3 +73,38 @@ func (repository *AuthRepositoryImpl) LoginOrRegister(ctx context.Context, user 
 	return user, nil
 
 }
+
+func (repository *AuthRepositoryImpl) ForgotLinkPassword(ctx context.Context, forgotData domain.ForgotPasswordLink, email string) error {
+	var user domain.UserModel
+
+	// Check if the user exists
+	err := repository.DB.Where(domain.UserModel{Email: email}).First(&user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// User not found
+			loghelper.Errorln(ctx, "ForgotLinkPassword | User not found")
+			return errors.New("user not registered")
+		}
+
+		// Other database error
+		loghelper.Errorln(ctx, fmt.Sprintf("ForgotLinkPassword | Error querying database, err:%s", err.Error()))
+		return err
+	}
+
+	// User found, create the forgot password link
+	err = repository.DB.Create(&forgotData).Error
+	if err != nil {
+		loghelper.Errorln(ctx, fmt.Sprintf("ForgotLinkPassword | Error creating link, err:%s", err.Error()))
+		return err
+	}
+
+	return nil
+}
+
+func (repository *AuthRepositoryImpl) ExpiredForgotPassword(ctx context.Context, forgotData domain.ForgotPasswordLink) error {
+	err := repository.DB.Model(&domain.ForgotPasswordLink{}).Where("hash_id = ?", forgotData.HashId).Updates(map[string]interface{}{"is_active": false}).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}

@@ -9,6 +9,7 @@ import (
 )
 
 func initHTTP() error {
+
 	appConf := appconfig.InitAppConfig()
 
 	var gConfig *gorm.Config = &gorm.Config{}

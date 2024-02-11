@@ -1,0 +1,3 @@
+CREATE TABLE IF NOT EXISTS tb_forgot_link (
+    id SERIAL PRIMARY KEY, link_url TEXT, is_active BOOLEAN DEFAULT true, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, expired_at TIMESTAMP NULL
+)
