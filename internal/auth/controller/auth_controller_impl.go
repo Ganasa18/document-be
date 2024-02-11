@@ -40,6 +40,10 @@ func (controller *AuthControllerImpl) LoginOrRegister(ctx *gin.Context) {
 		// SET ASSIGN JWT TOKEN
 		tokenString, err := helper.CreateToken(registerResponse.UserUniqueId, registerResponse.Email)
 		utils.PanicIfError(err)
+
+		// Create a new cookie
+		ctx.SetCookie("token", tokenString, 24*3600, "/", "", false, true)
+
 		registerResponse.Token = &tokenString
 		responseData = registerResponse
 	}

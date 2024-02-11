@@ -117,7 +117,6 @@ func (service *AuthServiceImpl) ForgotLinkPassword(ctx *gin.Context, request web
 	}
 
 	// Enqueue delayed jobs
-
 	err = service.AuthRepository.ForgotLinkPassword(ctx, forgotPassword, request.Email)
 	if err != nil {
 		panic(exception.NewNotFoundError(err.Error()))
@@ -127,14 +126,14 @@ func (service *AuthServiceImpl) ForgotLinkPassword(ctx *gin.Context, request web
 	queue.EnqueueDelayedJob(jobs, queue.Job{ID: time.Now().Local().String(), Payload: uniqueID, ExecuteAt: expiredAt})
 
 	// Create a new request email
-	r := email.NewRequest([]string{request.Email}, "My Apps | Forgot Password", "Forgot Password")
+	res := email.NewRequest([]string{request.Email}, "My Apps | Forgot Password", "Forgot Password")
 	// Parse the template with template data
 	basePath := appconfig.InitAppConfig().AppDir
 	templatePath := basePath + "/pkg/email/template/forgot-password.html"
 
-	utils.PanicIfError(r.ParseTemplate(templatePath, templateData))
+	utils.PanicIfError(res.ParseTemplate(templatePath, templateData))
 	// Send the email if template parsing is successful
-	if ok, err := r.SendEmail(); err == nil {
+	if ok, err := res.SendEmail(); err == nil {
 		fmt.Println(ok)
 	}
 
