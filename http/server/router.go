@@ -7,6 +7,7 @@ func (h *HttpServe) setupRouter() {
 	// AUTH
 	v1.POST("/login-or-register", h.authController.LoginOrRegister)
 	v1.POST("/forgot-password", h.authController.ForgotLinkPassword)
+	v1.POST("/reset-password", h.authController.ResetPasswordUser)
 
 	// WITH AUTHORZATION
 	v1.Use(middleware.CustomAuthMiddleware())

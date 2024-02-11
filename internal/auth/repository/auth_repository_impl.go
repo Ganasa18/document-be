@@ -108,3 +108,29 @@ func (repository *AuthRepositoryImpl) ExpiredForgotPassword(ctx context.Context,
 	}
 	return nil
 }
+
+func (repository *AuthRepositoryImpl) ResetPasswordUser(ctx context.Context, user domain.UserModel, hashId string) error {
+
+	var checkValid domain.ForgotPasswordLink
+	err := repository.DB.Model(&domain.ForgotPasswordLink{}).Where("hash_id = ?", hashId).First(&checkValid).Error
+	if err != nil {
+		return err
+	}
+	if checkValid.IsActive != nil && !*checkValid.IsActive {
+		return errors.New("expired reset password")
+	}
+
+	err = repository.DB.Model(&domain.UserModel{}).Where("email = ?", user.Email).Updates(map[string]interface{}{"password": user.Password, "updated_at": user.UpdatedAt}).Error
+	if err != nil {
+		loghelper.Errorln(ctx, fmt.Sprintf("ResetPasswordUser | Error update new password, err:%s", err.Error()))
+		return errors.New("failed update user password")
+	}
+
+	err = repository.DB.Model(&domain.ForgotPasswordLink{}).Where("hash_id = ?", hashId).Updates(map[string]interface{}{"is_active": false}).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

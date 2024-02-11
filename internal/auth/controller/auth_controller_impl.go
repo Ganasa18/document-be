@@ -21,7 +21,6 @@ func NewAuthController(authService service.AuthService) AuthController {
 	}
 }
 
-// LoginOrRegister implements AuthController.
 func (controller *AuthControllerImpl) LoginOrRegister(ctx *gin.Context) {
 	registerRequest := web.UserRegisterRequest{}
 
@@ -64,7 +63,7 @@ func (controller *AuthControllerImpl) ForgotLinkPassword(ctx *gin.Context) {
 
 	helper.ReadFromRequestBody(ctx.Request, &forgotRequest)
 
-	err := controller.AuthService.ForgotLinkPassword(ctx, forgotRequest)
+	value, err := controller.AuthService.ForgotLinkPassword(ctx, forgotRequest)
 
 	var statusCode int
 	var responseData interface{}
@@ -74,7 +73,38 @@ func (controller *AuthControllerImpl) ForgotLinkPassword(ctx *gin.Context) {
 		responseData = err.Error()
 	} else {
 		statusCode = http.StatusOK
-		responseData = "success send link"
+		responseData = web.ForgotPasswordResponseSuccess{
+			Status: "success send link",
+			HashId: value,
+		}
+	}
+
+	webResponse := response.WebResponse{
+		Code:   statusCode,
+		Status: http.StatusText(statusCode),
+		Data:   responseData,
+	}
+
+	helper.WriteToResponseBody(ctx, statusCode, webResponse)
+}
+
+func (controller *AuthControllerImpl) ResetPasswordUser(ctx *gin.Context) {
+
+	passwordResetRequest := web.ResetPasswordRequest{}
+
+	helper.ReadFromRequestBody(ctx.Request, &passwordResetRequest)
+
+	err := controller.AuthService.ResetPasswordUser(ctx, passwordResetRequest)
+
+	var statusCode int
+	var responseData interface{}
+
+	if err != nil {
+		statusCode = http.StatusBadRequest
+		responseData = err.Error()
+	} else {
+		statusCode = http.StatusOK
+		responseData = "success reset password"
 	}
 
 	webResponse := response.WebResponse{

@@ -2,6 +2,7 @@ package helper
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -15,7 +16,7 @@ type CustomClaims struct {
 }
 
 // Secret key used for signing and verifying the JWT
-var secretKey = []byte("your-secret-key")
+var secretKey = []byte(os.Getenv("SECRET_KEY_JWT"))
 
 func CreateToken(UserID string, Email string) (string, error) {
 	// Create a new CustomClaims instance with custom claims

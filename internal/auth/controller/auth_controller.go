@@ -7,4 +7,5 @@ import (
 type AuthController interface {
 	LoginOrRegister(ctx *gin.Context)
 	ForgotLinkPassword(ctx *gin.Context)
+	ResetPasswordUser(ctx *gin.Context)
 }

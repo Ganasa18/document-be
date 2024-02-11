@@ -20,6 +20,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthServiceImpl struct {
@@ -70,7 +71,7 @@ func (service *AuthServiceImpl) LoginOrRegister(ctx *gin.Context, request web.Us
 
 }
 
-func (service *AuthServiceImpl) ForgotLinkPassword(ctx *gin.Context, request web.ForgotPasswordRequest) error {
+func (service *AuthServiceImpl) ForgotLinkPassword(ctx *gin.Context, request web.ForgotPasswordRequest) (string, error) {
 
 	err := service.Validate.Struct(request)
 	utils.PanicIfError(err)
@@ -137,5 +138,25 @@ func (service *AuthServiceImpl) ForgotLinkPassword(ctx *gin.Context, request web
 		fmt.Println(ok)
 	}
 
+	return uniqueID, err
+}
+
+func (service *AuthServiceImpl) ResetPasswordUser(ctx *gin.Context, request web.ResetPasswordRequest) error {
+
+	err := service.Validate.Struct(request)
+	utils.PanicIfError(err)
+
+	// Hashing the password with the default cost of 10
+	hashedPassword, errHashedPassword := bcrypt.GenerateFromPassword([]byte(request.NewPassword), bcrypt.DefaultCost)
+	utils.IsErrorDoPanic(errHashedPassword)
+	hashedPasswordStr := string(hashedPassword)
+
+	resetPassword := domain.UserModel{
+		Email:     request.Email,
+		Password:  &hashedPasswordStr,
+		UpdatedAt: time.Now(),
+	}
+
+	err = service.AuthRepository.ResetPasswordUser(ctx, resetPassword, request.HashId)
 	return err
 }
