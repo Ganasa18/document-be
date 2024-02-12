@@ -7,8 +7,6 @@ import (
 	"strconv"
 	"time"
 
-	AuthModel "github.com/Ganasa18/document-be/internal/auth/model/domain"
-	RoleModel "github.com/Ganasa18/document-be/internal/crud/model/domain"
 	"github.com/Ganasa18/document-be/pkg/utils"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -56,7 +54,7 @@ func NewDatabase(cfg *Config, config *gorm.Config) (*gorm.DB, error) {
 		utils.IsErrorDoPanic(err)
 	}
 
-	db.AutoMigrate(&AuthModel.UserModel{}, AuthModel.ForgotPasswordLink{}, &RoleModel.RoleMasterModel{})
+	// db.AutoMigrate(&AuthModel.UserModel{}, AuthModel.ForgotPasswordLink{}, &RoleModel.RoleMasterModel{})
 
 	return db, nil
 

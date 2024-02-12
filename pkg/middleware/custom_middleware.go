@@ -12,60 +12,37 @@ import (
 
 func CustomAuthMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-
 		providedToken := ctx.Request.Header.Get(utils.HEADER_AUTHORIZATION)
-		// CHECK HANDLER IF AUTHORIZATION HEADER EMPTY
+
 		if providedToken == "" {
-			webResponse := web.WebResponse{
-				Code:   http.StatusUnauthorized,
-				Status: http.StatusText(http.StatusUnauthorized),
-				Data:   "Token not Provided",
-			}
-			helper.WriteToResponseBody(ctx, http.StatusUnauthorized, webResponse)
-			ctx.Abort()
+			handleUnauthorized(ctx, "Token not Provided")
 			return
 		}
 
 		authSplited := strings.Split(providedToken, " ")
 
-		// CHECK HANDLER IF AUTHORIZATION HEADER NOT HAVE BEARER
-		if authSplited[0] != "Bearer" {
-			webResponse := web.WebResponse{
-				Code:   http.StatusUnauthorized,
-				Status: http.StatusText(http.StatusUnauthorized),
-				Data:   "Header Authorization is not valid: Bearer not found",
-			}
-			helper.WriteToResponseBody(ctx, http.StatusUnauthorized, webResponse)
-			ctx.Abort()
-			return
-		}
-
-		// CHECK LENGTH AUTHORIZATION
-		if len(authSplited) < 2 || len(authSplited) > 2 {
-			webResponse := web.WebResponse{
-				Code:   http.StatusUnauthorized,
-				Status: http.StatusText(http.StatusUnauthorized),
-				Data:   "Header Authorization is not valid: len not valid",
-			}
-			helper.WriteToResponseBody(ctx, http.StatusUnauthorized, webResponse)
-			ctx.Abort()
+		if len(authSplited) != 2 || authSplited[0] != "Bearer" {
+			handleUnauthorized(ctx, "Header Authorization is not valid")
 			return
 		}
 
 		tokenValid, _ := helper.ValidateToken(authSplited[1])
 
-		// CHECK TOKEN VALID
 		if tokenValid == nil {
-			webResponse := web.WebResponse{
-				Code:   http.StatusUnauthorized,
-				Status: http.StatusText(http.StatusUnauthorized),
-				Data:   "Not Authorization",
-			}
-			helper.WriteToResponseBody(ctx, http.StatusUnauthorized, webResponse)
-			ctx.Abort()
+			handleUnauthorized(ctx, "Not Authorized")
 			return
 		}
 
 		ctx.Next()
 	}
+}
+
+func handleUnauthorized(ctx *gin.Context, message string) {
+	webResponse := web.WebResponse{
+		Code:   http.StatusUnauthorized,
+		Status: http.StatusText(http.StatusUnauthorized),
+		Data:   message,
+	}
+	helper.WriteToResponseBody(ctx, http.StatusUnauthorized, webResponse)
+	ctx.Abort()
 }

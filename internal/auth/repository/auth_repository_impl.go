@@ -53,6 +53,14 @@ func (repository *AuthRepositoryImpl) LoginOrRegister(ctx context.Context, user 
 			loghelper.Errorln(ctx, fmt.Sprintf("LoginOrRegister | Error creating user, err:%s", err.Error()))
 			return user, err
 		}
+
+		// Update User Profile
+		err = repository.DB.Model(&domain.UserModel{}).Where("id = ?", user.Id).Updates(map[string]interface{}{"profile_id": user.Id}).Error
+		if err != nil {
+			loghelper.Errorln(ctx, fmt.Sprintf("LoginOrRegister | Error updating user profile, err:%s", err.Error()))
+			return user, err
+		}
+
 		return user, nil
 	}
 
@@ -72,6 +80,27 @@ func (repository *AuthRepositoryImpl) LoginOrRegister(ctx context.Context, user 
 
 	return user, nil
 
+}
+
+func (repository *AuthRepositoryImpl) CreateOrGetProfile(ctx context.Context, profile domain.ProfileUser) (domain.ProfileUser, error) {
+	// Check if the profile exists
+	println("PROFILE ID", profile.UserId)
+	err := repository.DB.Where(domain.ProfileUser{UserId: profile.UserId}).First(&profile).Error
+	if err != nil {
+		// If the profile does not exist, create it
+		if err == gorm.ErrRecordNotFound {
+			if createErr := repository.DB.Create(&profile).Error; createErr != nil {
+				loghelper.Errorln(ctx, fmt.Sprintf("CreateOrGetProfile | Error creating profile, err:%s", createErr.Error()))
+				return profile, createErr
+			}
+		} else {
+			// Error getting profile
+			loghelper.Errorln(ctx, fmt.Sprintf("CreateOrGetProfile | Error getting profile err:%s", err.Error()))
+			return profile, err
+		}
+	}
+
+	return profile, nil
 }
 
 func (repository *AuthRepositoryImpl) ForgotLinkPassword(ctx context.Context, forgotData domain.ForgotPasswordLink, email string) error {

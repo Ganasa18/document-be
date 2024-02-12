@@ -9,13 +9,21 @@ import (
 )
 
 type UserRegisterRequest struct {
-	Email    string  `validate:"required,email" json:"email"`
-	Password string  `json:"password"`
-	OpenId   string  `validate:"required" json:"open_id"`
-	Username *string `json:"username"`
+	Email        string  `validate:"required,email" json:"email"`
+	Password     string  `json:"password"`
+	OpenId       string  `validate:"required" json:"open_id"`
+	Username     *string `json:"username"`
+	ProfileImage *string `json:"profile_image"`
+}
+
+type ProfileUserResponse struct {
+	FirstName    *string `json:"first_name"`
+	LastName     *string `json:"last_name"`
+	ProfileImage *string `json:"profile_image"`
 }
 
 type UserRegisterResponse struct {
+	Token        *string                     `json:"token"`
 	Id           int                         `json:"id"`
 	OpenId       string                      `json:"open_id"`
 	UserUniqueId string                      `json:"user_unique_id"`
@@ -23,17 +31,23 @@ type UserRegisterResponse struct {
 	Email        string                      `json:"email"`
 	IsActive     bool                        `json:"is_active"`
 	Role         role.RoleMasterResponseJoin `json:"role"`
-	Token        *string                     `json:"token"`
+	Profile      ProfileUserResponse         `json:"profile"`
 	CreatedAt    time.Time                   `json:"created_at"`
 	UpdatedAt    time.Time                   `json:"updated_at"`
 	DeletedAt    *gorm.DeletedAt             `json:"deleted_at"`
 }
 
-func ToUserRegisterResponse(user domain.UserModel, errorData error) (UserRegisterResponse, error) {
+func ToUserRegisterResponse(user domain.UserModel, profile domain.ProfileUser, errorData error) (UserRegisterResponse, error) {
 
 	userRole := role.RoleMasterResponseJoin{
 		Id:       user.RoleMasterModel.Id,
 		RoleName: user.RoleMasterModel.RoleName,
+	}
+
+	userProfile := ProfileUserResponse{
+		FirstName:    profile.FirstName,
+		LastName:     profile.LastName,
+		ProfileImage: profile.ProfileImage,
 	}
 
 	loginResponse := UserRegisterResponse{
@@ -43,6 +57,7 @@ func ToUserRegisterResponse(user domain.UserModel, errorData error) (UserRegiste
 		Email:        user.Email,
 		Username:     user.Username,
 		Role:         userRole,
+		Profile:      userProfile,
 		CreatedAt:    user.CreatedAt,
 		UpdatedAt:    user.UpdatedAt,
 	}

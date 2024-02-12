@@ -67,7 +67,16 @@ func (service *AuthServiceImpl) LoginOrRegister(ctx *gin.Context, request web.Us
 
 	data, err := service.AuthRepository.LoginOrRegister(ctx, register, OpenId)
 
-	return web.ToUserRegisterResponse(data, err)
+	profile := domain.ProfileUser{
+		UserId:       data.Id,
+		FirstName:    request.Username,
+		ProfileImage: request.ProfileImage,
+	}
+
+	profileRes, errProfile := service.AuthRepository.CreateOrGetProfile(ctx, profile)
+	utils.PanicIfError(errProfile)
+
+	return web.ToUserRegisterResponse(data, profileRes, err)
 
 }
 

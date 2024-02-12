@@ -16,6 +16,7 @@ type UserModel struct {
 	Password        *string                `json:"password"`
 	IsActive        bool                   `json:"is_active"`
 	RoleId          *int                   `json:"role_id"`
+	ProfileId       *int                   `json:"profile_id"`
 	RoleMasterModel domain.RoleMasterModel `gorm:"foreignKey:RoleId"`
 	CreatedAt       time.Time              `json:"created_at"`
 	UpdatedAt       time.Time              `json:"updated_at"`
@@ -24,4 +25,18 @@ type UserModel struct {
 
 func (UserModel) TableName() string {
 	return "ms_users"
+}
+
+type ProfileUser struct {
+	Id           int       `json:"id" gorm:"primaryKey"`
+	UserId       int       `json:"user_id"`
+	FirstName    *string   `json:"first_name" gorm:"type:varchar(200)"`
+	LastName     *string   `json:"last_name" gorm:"type:varchar(200)"`
+	ProfileImage *string   `json:"profile_image"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+}
+
+func (ProfileUser) TableName() string {
+	return "user_profile"
 }
