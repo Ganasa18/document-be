@@ -28,6 +28,9 @@ func (controller *AuthControllerImpl) LoginOrRegister(ctx *gin.Context) {
 
 	registerResponse, err := controller.AuthService.LoginOrRegister(ctx, registerRequest)
 
+	// GET USER MENU
+	userMenu, _ := controller.AuthService.GetUserMenu(ctx, registerResponse.Role.Id)
+
 	var statusCode int
 	var responseData interface{}
 
@@ -44,6 +47,7 @@ func (controller *AuthControllerImpl) LoginOrRegister(ctx *gin.Context) {
 		ctx.SetCookie("token", tokenString, 24*3600, "/", "", false, true)
 
 		registerResponse.Token = &tokenString
+		registerResponse.Menu = &userMenu
 		responseData = registerResponse
 	}
 

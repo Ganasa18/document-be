@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/Ganasa18/document-be/internal/auth/model/domain"
+	crudDomain "github.com/Ganasa18/document-be/internal/crud/model/domain"
 	"github.com/Ganasa18/document-be/pkg/loghelper"
 	"github.com/Ganasa18/document-be/pkg/utils"
 	"golang.org/x/crypto/bcrypt"
@@ -84,7 +85,6 @@ func (repository *AuthRepositoryImpl) LoginOrRegister(ctx context.Context, user 
 
 func (repository *AuthRepositoryImpl) CreateOrGetProfile(ctx context.Context, profile domain.ProfileUser) (domain.ProfileUser, error) {
 	// Check if the profile exists
-	println("PROFILE ID", profile.UserId)
 	err := repository.DB.Where(domain.ProfileUser{UserId: profile.UserId}).First(&profile).Error
 	if err != nil {
 		// If the profile does not exist, create it
@@ -162,4 +162,16 @@ func (repository *AuthRepositoryImpl) ResetPasswordUser(ctx context.Context, use
 	}
 
 	return nil
+}
+
+func (repository *AuthRepositoryImpl) GetUserMenu(ctx context.Context, RoleId int) ([]crudDomain.UserAccessMenuModel, error) {
+	user_access := []crudDomain.UserAccessMenuModel{}
+	err := repository.DB.Model(&user_access).Where("role_id = ?", RoleId).Preload("RoleMasterModel").Preload("MenuMasterModel").Find(&user_access).Error
+
+	if err != nil {
+		loghelper.Errorln(ctx, fmt.Sprintf("GetUserMenu | Error when Query builder list data, err:%s", err.Error()))
+		return user_access, err
+	}
+
+	return user_access, nil
 }

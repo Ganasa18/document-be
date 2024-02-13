@@ -1,3 +1,3 @@
-CREATE TABLE IF NOT EXISTS tb_forgot_link (
+CREATE TABLE IF NOT EXISTS forgot_password_links (
     id SERIAL PRIMARY KEY, link_url TEXT, hash_id VARCHAR(250), is_active BOOLEAN DEFAULT true, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )

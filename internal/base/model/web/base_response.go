@@ -9,8 +9,8 @@ type WebResponse struct {
 type WebResponsePaginate struct {
 	Code     int         `json:"code"`
 	Status   string      `json:"status"`
-	Data     interface{} `json:"listData"`
-	PageInfo interface{} `json:"pageInfo"`
+	Data     interface{} `json:"list_data"`
+	PageInfo interface{} `json:"page_info"`
 }
 
 type PageInfoResponse struct {

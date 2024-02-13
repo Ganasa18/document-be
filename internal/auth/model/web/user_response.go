@@ -4,7 +4,8 @@ import (
 	"time"
 
 	"github.com/Ganasa18/document-be/internal/auth/model/domain"
-	role "github.com/Ganasa18/document-be/internal/crud/model/web"
+	crudDomain "github.com/Ganasa18/document-be/internal/crud/model/domain"
+	crud "github.com/Ganasa18/document-be/internal/crud/model/web"
 	"gorm.io/gorm"
 )
 
@@ -30,8 +31,9 @@ type UserRegisterResponse struct {
 	Username     *string                     `json:"username"`
 	Email        string                      `json:"email"`
 	IsActive     bool                        `json:"is_active"`
-	Role         role.RoleMasterResponseJoin `json:"role"`
+	Role         crud.RoleMasterResponseJoin `json:"role"`
 	Profile      ProfileUserResponse         `json:"profile"`
+	Menu         *[]crud.MenuMasterResponse  `json:"user_menu"`
 	CreatedAt    time.Time                   `json:"created_at"`
 	UpdatedAt    time.Time                   `json:"updated_at"`
 	DeletedAt    *gorm.DeletedAt             `json:"deleted_at"`
@@ -39,7 +41,7 @@ type UserRegisterResponse struct {
 
 func ToUserRegisterResponse(user domain.UserModel, profile domain.ProfileUser, errorData error) (UserRegisterResponse, error) {
 
-	userRole := role.RoleMasterResponseJoin{
+	userRole := crud.RoleMasterResponseJoin{
 		Id:       user.RoleMasterModel.Id,
 		RoleName: user.RoleMasterModel.RoleName,
 	}
@@ -63,4 +65,30 @@ func ToUserRegisterResponse(user domain.UserModel, profile domain.ProfileUser, e
 	}
 
 	return loginResponse, errorData
+}
+
+func ToUserAccessResponse(user_access crudDomain.UserAccessMenuModel) crud.MenuMasterResponse {
+
+	var userAccessResponse = crud.MenuMasterResponse{
+		Id:         user_access.MenuId,
+		Name:       user_access.MenuMasterModel.Name,
+		Title:      user_access.MenuMasterModel.Title,
+		Path:       user_access.MenuMasterModel.Path,
+		IconName:   user_access.MenuMasterModel.IconName,
+		IsSubMenu:  user_access.MenuMasterModel.IsSubMenu,
+		ParentName: user_access.MenuMasterModel.ParentName,
+		Create:     user_access.Create,
+		Read:       user_access.Read,
+		Update:     user_access.Update,
+		Delete:     user_access.Delete,
+	}
+	return userAccessResponse
+}
+
+func ToUserAccessResponses(user_access []crudDomain.UserAccessMenuModel, err error) ([]crud.MenuMasterResponse, error) {
+	var userAccessResponse []crud.MenuMasterResponse
+	for _, access := range user_access {
+		userAccessResponse = append(userAccessResponse, ToUserAccessResponse(access))
+	}
+	return userAccessResponse, err
 }

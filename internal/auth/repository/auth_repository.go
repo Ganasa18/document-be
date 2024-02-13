@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Ganasa18/document-be/internal/auth/model/domain"
+	crudDomain "github.com/Ganasa18/document-be/internal/crud/model/domain"
 )
 
 type AuthRepository interface {
@@ -12,4 +13,5 @@ type AuthRepository interface {
 	ForgotLinkPassword(ctx context.Context, forgotData domain.ForgotPasswordLink, email string) error
 	ExpiredForgotPassword(ctx context.Context, forgotData domain.ForgotPasswordLink) error
 	ResetPasswordUser(ctx context.Context, user domain.UserModel, hashId string) error
+	GetUserMenu(ctx context.Context, RoleId int) ([]crudDomain.UserAccessMenuModel, error)
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/Ganasa18/document-be/internal/auth/model/domain"
 	"github.com/Ganasa18/document-be/internal/auth/model/web"
 	"github.com/Ganasa18/document-be/internal/auth/repository"
+	crud "github.com/Ganasa18/document-be/internal/crud/model/web"
 	"github.com/Ganasa18/document-be/pkg/email"
 	"github.com/Ganasa18/document-be/pkg/exception"
 	"github.com/Ganasa18/document-be/pkg/helper"
@@ -168,4 +169,13 @@ func (service *AuthServiceImpl) ResetPasswordUser(ctx *gin.Context, request web.
 
 	err = service.AuthRepository.ResetPasswordUser(ctx, resetPassword, request.HashId)
 	return err
+}
+
+func (service *AuthServiceImpl) GetUserMenu(ctx *gin.Context, RoleId int) ([]crud.MenuMasterResponse, error) {
+
+	// Get User Menu
+	user_access, err := service.AuthRepository.GetUserMenu(ctx, RoleId)
+	utils.PanicIfError(err)
+
+	return web.ToUserAccessResponses(user_access, err)
 }

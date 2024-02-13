@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS tb_forgot_link;
+DROP TABLE IF EXISTS forgot_password_links;
