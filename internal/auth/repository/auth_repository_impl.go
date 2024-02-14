@@ -167,7 +167,7 @@ func (repository *AuthRepositoryImpl) ResetPasswordUser(ctx context.Context, use
 
 func (repository *AuthRepositoryImpl) GetUserMenu(ctx context.Context, RoleId int) ([]crudDomain.UserAccessMenuModel, error) {
 	user_access := []crudDomain.UserAccessMenuModel{}
-	err := repository.DB.Model(&user_access).Where("role_id = ?", RoleId).Preload("RoleMasterModel").Preload("MenuMasterModel").Find(&user_access).Error
+	err := repository.DB.Model(&user_access).Where("deleted_at IS NULL").Where("role_id = ?", RoleId).Preload("RoleMasterModel").Preload("MenuMasterModel").Find(&user_access).Error
 
 	if err != nil {
 		loghelper.Errorln(ctx, fmt.Sprintf("GetUserMenu | Error when Query builder list data, err:%s", err.Error()))

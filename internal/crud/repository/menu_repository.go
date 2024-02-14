@@ -10,6 +10,6 @@ type MenuRepository interface {
 	GetAllMenu(ctx *gin.Context, pagination *helper.PaginationInput) ([]domain.MenuMasterModel, int64, error)
 	GetMenuById(ctx *gin.Context, id int) (domain.MenuMasterModel, error)
 	CreateMenu(ctx *gin.Context, request domain.MenuMasterModel) (domain.MenuMasterModel, error)
-	UpdateMenu(ctx *gin.Context, request domain.MenuMasterModel)
+	UpdateMenu(ctx *gin.Context, request domain.MenuMasterModel, id int) (domain.MenuMasterModel, error)
 	DeleteMenu(ctx *gin.Context, id int) error
 }

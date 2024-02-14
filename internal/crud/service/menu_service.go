@@ -10,6 +10,6 @@ type MenuService interface {
 	GetAllMenu(ctx *gin.Context, pagination *helper.PaginationInput) ([]web.MenuMasterResponse, int64, error)
 	GetMenuById(ctx *gin.Context) web.MenuMasterResponse
 	CreateMenu(ctx *gin.Context, request web.MenuMasterRequest) (web.MenuMasterResponse, error)
-	UpdateMenu(ctx *gin.Context, request web.MenuMasterRequest)
-	DeleteMenu(ctx *gin.Context)
+	UpdateMenu(ctx *gin.Context, request web.MenuMasterRequestEdit) (web.MenuMasterResponse, error)
+	DeleteMenu(ctx *gin.Context) error
 }

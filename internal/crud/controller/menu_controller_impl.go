@@ -47,10 +47,6 @@ func (controller *MenuControllerImpl) CreateMenu(ctx *gin.Context) {
 	helper.WriteToResponseBody(ctx, statusCode, webResponse)
 }
 
-func (controller *MenuControllerImpl) DeleteMenu(ctx *gin.Context) {
-	panic("unimplemented")
-}
-
 func (controller *MenuControllerImpl) GetAllMenu(ctx *gin.Context) {
 	pagination := helper.Pagination(ctx)
 	menuResponse, totalRow, err := controller.MenuService.GetAllMenu(ctx, &pagination)
@@ -89,9 +85,62 @@ func (controller *MenuControllerImpl) GetAllMenu(ctx *gin.Context) {
 }
 
 func (controller *MenuControllerImpl) GetMenuById(ctx *gin.Context) {
-	panic("unimplemented")
+	menuResponse := controller.MenuService.GetMenuById(ctx)
+
+	webResponse := response.WebResponse{
+		Code:   http.StatusOK,
+		Status: http.StatusText(http.StatusOK),
+		Data:   menuResponse,
+	}
+
+	helper.WriteToResponseBody(ctx, http.StatusOK, webResponse)
 }
 
 func (controller *MenuControllerImpl) UpdateMenu(ctx *gin.Context) {
-	panic("unimplemented")
+	menuRequest := web.MenuMasterRequestEdit{}
+	helper.ReadFromRequestBody(ctx.Request, &menuRequest)
+
+	roleResponse, err := controller.MenuService.UpdateMenu(ctx, menuRequest)
+
+	var statusCode int
+	var responseData interface{}
+
+	if err != nil {
+		statusCode = http.StatusBadRequest
+		responseData = err.Error()
+	} else {
+		statusCode = http.StatusOK
+		responseData = roleResponse
+	}
+
+	webResponse := response.WebResponse{
+		Code:   statusCode,
+		Status: http.StatusText(statusCode),
+		Data:   responseData,
+	}
+
+	helper.WriteToResponseBody(ctx, statusCode, webResponse)
+}
+
+func (controller *MenuControllerImpl) DeleteMenu(ctx *gin.Context) {
+	err := controller.MenuService.DeleteMenu(ctx)
+
+	var statusCode int
+	var responseData interface{}
+
+	if err != nil {
+		statusCode = http.StatusBadRequest
+		responseData = err.Error()
+	} else {
+		statusCode = http.StatusOK
+		responseData = "success deleted"
+	}
+
+	webResponse := response.WebResponse{
+		Code:   statusCode,
+		Status: http.StatusText(statusCode),
+		Data:   responseData,
+	}
+
+	helper.WriteToResponseBody(ctx, statusCode, webResponse)
 }

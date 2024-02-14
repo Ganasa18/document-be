@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/Ganasa18/document-be/internal/crud/model/domain"
@@ -28,10 +29,6 @@ func (repository *MenuRepositoryImpl) CreateMenu(ctx *gin.Context, menu domain.M
 		return menu, err
 	}
 	return menu, nil
-}
-
-func (repository *MenuRepositoryImpl) DeleteMenu(ctx *gin.Context, id int) error {
-	panic("unimplemented")
 }
 
 func (repository *MenuRepositoryImpl) GetAllMenu(ctx *gin.Context, pagination *helper.PaginationInput) (menu []domain.MenuMasterModel, totalRow int64, err error) {
@@ -67,10 +64,87 @@ func (repository *MenuRepositoryImpl) GetAllMenu(ctx *gin.Context, pagination *h
 
 }
 
-func (repository *MenuRepositoryImpl) GetMenuById(ctx *gin.Context, id int) (domain.MenuMasterModel, error) {
-	panic("unimplemented")
+func (repository *MenuRepositoryImpl) GetMenuById(ctx *gin.Context, id int) (menu domain.MenuMasterModel, err error) {
+	err = repository.DB.Model(&domain.MenuMasterModel{}).First(&menu, id).Error
+	if err != nil {
+		loghelper.Errorln(ctx, fmt.Sprintf("GetMenuById | Error when Query builder get data, err:%s", err.Error()))
+		return menu, errors.New("menu not found")
+	}
+	return menu, nil
 }
 
-func (repository *MenuRepositoryImpl) UpdateMenu(ctx *gin.Context, request domain.MenuMasterModel) {
-	panic("unimplemented")
+func (repository *MenuRepositoryImpl) UpdateMenu(ctx *gin.Context, menu domain.MenuMasterModel, id int) (domain.MenuMasterModel, error) {
+	// Check if the menu with the given ID exists
+	if err := repository.checkIfMenuExists(ctx, id); err != nil {
+		return menu, err
+	}
+
+	// Update the menu for the given ID
+	if err := repository.updateMenuFields(ctx, id, menu); err != nil {
+		return menu, err
+	}
+
+	// Retrieve the updated menu
+	if err := repository.getUpdatedMenu(ctx, id, &menu); err != nil {
+		return menu, err
+	}
+
+	return menu, nil
+}
+
+func (repository *MenuRepositoryImpl) DeleteMenu(ctx *gin.Context, id int) error {
+	menu := &domain.MenuMasterModel{Id: id}
+
+	err := repository.DB.First(&domain.MenuMasterModel{}, id).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return errors.New("menu not found")
+	}
+
+	err = repository.DB.Delete(menu).Error
+
+	if err != nil {
+		loghelper.Errorln(ctx, fmt.Sprintf("DeleteMenu | Error when deleting menu, err: %s", err.Error()))
+		return errors.New("failed to delete menu")
+	}
+
+	return nil
+}
+
+func (repository *MenuRepositoryImpl) checkIfMenuExists(ctx *gin.Context, id int) error {
+	err := repository.DB.First(&domain.MenuMasterModel{}, id).Error
+	if err != nil {
+		loghelper.Errorln(ctx, fmt.Sprintf("UpdateMenu | Error when querying data, err:%s", err.Error()))
+		return errors.New("menu not found")
+	}
+	return nil
+}
+
+func (repository *MenuRepositoryImpl) updateMenuFields(ctx *gin.Context, id int, menu domain.MenuMasterModel) error {
+
+	updateFields := domain.MenuUpdate{
+		Name:      menu.Name,
+		Title:     menu.Title,
+		Path:      menu.Path,
+		IconName:  menu.IconName,
+		IsSubMenu: menu.IsSubMenu,
+	}
+
+	err := repository.DB.Model(&domain.MenuMasterModel{}).
+		Where("id = ?", id).
+		Updates(updateFields).Error
+	if err != nil {
+		loghelper.Errorln(ctx, fmt.Sprintf("UpdateMenu | Error when updating data, err:%s", err.Error()))
+		return errors.New("failed to update menu")
+	}
+	return nil
+}
+
+func (repository *MenuRepositoryImpl) getUpdatedMenu(ctx *gin.Context, id int, menu *domain.MenuMasterModel) error {
+	err := repository.DB.First(menu, id).Error
+	if err != nil {
+		loghelper.Errorln(ctx, fmt.Sprintf("UpdateMenu | Error when querying updated data, err:%s", err.Error()))
+		return errors.New("failed to get updated menu")
+	}
+	return nil
 }

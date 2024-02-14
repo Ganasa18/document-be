@@ -42,6 +42,15 @@ type MenuMasterRequest struct {
 	ParentName *string `json:"parent_name"`
 }
 
+type MenuMasterRequestEdit struct {
+	Name       string  `json:"name" validate:"required,lowercase"`
+	Title      string  `json:"title" validate:"required"`
+	Path       *string `json:"path"`
+	IconName   *string `json:"icon_name"`
+	IsSubMenu  bool    `json:"is_submenu"`
+	ParentName *string `json:"parent_name"`
+}
+
 func ToMenuMasterResponseWithError(menu domain.MenuMasterModel, err error) (MenuMasterResponse, error) {
 	var menuResponse = MenuMasterResponse{
 		Id:         menu.Id,

@@ -21,7 +21,7 @@ func (h *HttpServe) setupRouter() {
 	v1.GET("/crud/menu", h.menuController.GetAllMenu)
 	v1.GET("/crud/menu/:menuId", h.menuController.GetMenuById)
 	v1.POST("/crud/menu", h.menuController.CreateMenu)
-	v1.PATCH("/crud/menu/:menuId", h.menuController.CreateMenu)
+	v1.PATCH("/crud/menu/:menuId", h.menuController.UpdateMenu)
 	v1.DELETE("/crud/menu/:menuId", h.menuController.DeleteMenu)
 
 }

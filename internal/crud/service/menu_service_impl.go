@@ -1,9 +1,12 @@
 package service
 
 import (
+	"strconv"
+
 	"github.com/Ganasa18/document-be/internal/crud/model/domain"
 	"github.com/Ganasa18/document-be/internal/crud/model/web"
 	"github.com/Ganasa18/document-be/internal/crud/repository"
+	"github.com/Ganasa18/document-be/pkg/exception"
 	"github.com/Ganasa18/document-be/pkg/helper"
 	"github.com/Ganasa18/document-be/pkg/utils"
 	"github.com/gin-gonic/gin"
@@ -42,19 +45,57 @@ func (service *MenuServiceImpl) CreateMenu(ctx *gin.Context, request web.MenuMas
 	return web.ToMenuMasterResponseWithError(menuResponse, err)
 }
 
-func (service *MenuServiceImpl) DeleteMenu(ctx *gin.Context) {
-	panic("unimplemented")
-}
-
 func (service *MenuServiceImpl) GetAllMenu(ctx *gin.Context, pagination *helper.PaginationInput) ([]web.MenuMasterResponse, int64, error) {
 	menuResponse, totalRow, err := service.MenuRepository.GetAllMenu(ctx, pagination)
 	return web.ToMenuMasterResponses(menuResponse, totalRow, err)
 }
 
 func (service *MenuServiceImpl) GetMenuById(ctx *gin.Context) web.MenuMasterResponse {
-	panic("unimplemented")
+	menuId := ctx.Params.ByName("menuId")
+	id, err := strconv.Atoi(menuId)
+	utils.PanicIfError(err)
+	menuResponse, err := service.MenuRepository.GetMenuById(ctx, id)
+	if err != nil {
+		panic(exception.NewNotFoundError(err.Error()))
+	}
+
+	return web.ToMenuMasterResponse(menuResponse)
 }
 
-func (service *MenuServiceImpl) UpdateMenu(ctx *gin.Context, request web.MenuMasterRequest) {
-	panic("unimplemented")
+func (service *MenuServiceImpl) UpdateMenu(ctx *gin.Context, request web.MenuMasterRequestEdit) (web.MenuMasterResponse, error) {
+	err := service.Validate.Struct(request)
+	utils.PanicIfError(err)
+
+	menuId := ctx.Params.ByName("menuId")
+	id, err := strconv.Atoi(menuId)
+	utils.PanicIfError(err)
+
+	// LOGIC
+	menu := domain.MenuMasterModel{
+		Name:       request.Name,
+		Title:      request.Title,
+		Path:       request.Path,
+		IconName:   request.IconName,
+		IsSubMenu:  request.IsSubMenu,
+		ParentName: request.ParentName,
+	}
+
+	menuResponse, err := service.MenuRepository.UpdateMenu(ctx, menu, id)
+
+	if err != nil {
+		if err.Error() == "menu not found" {
+			panic(exception.NewNotFoundError(err.Error()))
+		}
+	}
+
+	return web.ToMenuMasterResponseWithError(menuResponse, err)
+}
+
+func (service *MenuServiceImpl) DeleteMenu(ctx *gin.Context) error {
+	menuId := ctx.Params.ByName("menuId")
+	id, err := strconv.Atoi(menuId)
+	utils.PanicIfError(err)
+	err = service.MenuRepository.DeleteMenu(ctx, id)
+
+	return err
 }

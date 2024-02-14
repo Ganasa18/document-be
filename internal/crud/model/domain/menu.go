@@ -19,6 +19,15 @@ type MenuMasterModel struct {
 	DeletedAt  gorm.DeletedAt `json:"deleted_at"`
 }
 
+type MenuUpdate struct {
+	Name       string  `json:"name"`
+	Title      string  `json:"title"`
+	Path       *string `json:"path"`
+	IconName   *string `json:"icon_name"`
+	IsSubMenu  bool    `json:"is_sub_menu"`
+	ParentName *string `json:"parent_name"`
+}
+
 func (MenuMasterModel) TableName() string {
 	return "ms_menu"
 }
