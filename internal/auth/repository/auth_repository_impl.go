@@ -37,6 +37,7 @@ func (repository *AuthRepositoryImpl) LoginOrRegister(ctx context.Context, user 
 	// REGISTER USER
 	if err != nil {
 		loghelper.Errorln(ctx, fmt.Sprintf("LoginOrRegister | Error fetching the user, err:%s", err.Error()))
+
 		if OpenId != utils.OPEN_API_GOOGLE {
 
 			if plainPassword == "" {

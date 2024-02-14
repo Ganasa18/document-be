@@ -19,7 +19,7 @@ import (
 	"github.com/Ganasa18/document-be/pkg/queue"
 	"github.com/Ganasa18/document-be/pkg/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator"
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -171,7 +171,7 @@ func (service *AuthServiceImpl) ResetPasswordUser(ctx *gin.Context, request web.
 	return err
 }
 
-func (service *AuthServiceImpl) GetUserMenu(ctx *gin.Context, RoleId int) ([]crud.MenuMasterResponse, error) {
+func (service *AuthServiceImpl) GetUserMenu(ctx *gin.Context, RoleId int) ([]crud.MenuMasterUserResponse, error) {
 
 	// Get User Menu
 	user_access, err := service.AuthRepository.GetUserMenu(ctx, RoleId)

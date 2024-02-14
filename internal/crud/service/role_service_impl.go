@@ -10,7 +10,7 @@ import (
 	"github.com/Ganasa18/document-be/pkg/helper"
 	"github.com/Ganasa18/document-be/pkg/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator"
+	"github.com/go-playground/validator/v10"
 )
 
 type RoleServiceImpl struct {

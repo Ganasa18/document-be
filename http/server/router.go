@@ -11,11 +11,17 @@ func (h *HttpServe) setupRouter() {
 
 	// WITH AUTHORZATION
 	v1.Use(middleware.CustomAuthMiddleware())
-	// CRUD MASTER
+	// ROLE MASTER
 	v1.GET("/crud/role", h.roleController.GetRoles)
 	v1.GET("/crud/role/:roleId", h.roleController.GetRoleById)
 	v1.POST("/crud/role", h.roleController.CreateRole)
 	v1.PATCH("/crud/role/:roleId", h.roleController.UpdateRole)
 	v1.DELETE("/crud/role/:roleId", h.roleController.DeleteRole)
+	// MENU MASTER
+	v1.GET("/crud/menu", h.menuController.GetAllMenu)
+	v1.GET("/crud/menu/:menuId", h.menuController.GetMenuById)
+	v1.POST("/crud/menu", h.menuController.CreateMenu)
+	v1.PATCH("/crud/menu/:menuId", h.menuController.CreateMenu)
+	v1.DELETE("/crud/menu/:menuId", h.menuController.DeleteMenu)
 
 }

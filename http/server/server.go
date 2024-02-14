@@ -13,9 +13,10 @@ type HttpServe struct {
 	router         *gin.Engine
 	authController authController.AuthController
 	roleController crudController.RoleController
+	menuController crudController.MenuController
 }
 
-func RunHttpServer(appConf *appconfig.Config, authController authController.AuthController, roleController crudController.RoleController) error {
+func RunHttpServer(appConf *appconfig.Config, authController authController.AuthController, roleController crudController.RoleController, menuController crudController.MenuController) error {
 	var hs HttpServe
 
 	hs.router = gin.New()
@@ -34,6 +35,7 @@ func RunHttpServer(appConf *appconfig.Config, authController authController.Auth
 
 	hs.authController = authController
 	hs.roleController = roleController
+	hs.menuController = menuController
 	hs.setupRouter()
 
 	return hs.router.Run(appConf.AppUrl + ":" + appConf.AppPort)

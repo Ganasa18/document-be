@@ -24,19 +24,19 @@ type ProfileUserResponse struct {
 }
 
 type UserRegisterResponse struct {
-	Token        *string                     `json:"token"`
-	Id           int                         `json:"id"`
-	OpenId       string                      `json:"open_id"`
-	UserUniqueId string                      `json:"user_unique_id"`
-	Username     *string                     `json:"username"`
-	Email        string                      `json:"email"`
-	IsActive     bool                        `json:"is_active"`
-	Role         crud.RoleMasterResponseJoin `json:"role"`
-	Profile      ProfileUserResponse         `json:"profile"`
-	Menu         *[]crud.MenuMasterResponse  `json:"user_menu"`
-	CreatedAt    time.Time                   `json:"created_at"`
-	UpdatedAt    time.Time                   `json:"updated_at"`
-	DeletedAt    *gorm.DeletedAt             `json:"deleted_at"`
+	Token        *string                        `json:"token"`
+	Id           int                            `json:"id"`
+	OpenId       string                         `json:"open_id"`
+	UserUniqueId string                         `json:"user_unique_id"`
+	Username     *string                        `json:"username"`
+	Email        string                         `json:"email"`
+	IsActive     bool                           `json:"is_active"`
+	Role         crud.RoleMasterResponseJoin    `json:"role"`
+	Profile      ProfileUserResponse            `json:"profile"`
+	Menu         *[]crud.MenuMasterUserResponse `json:"user_menu"`
+	CreatedAt    time.Time                      `json:"created_at"`
+	UpdatedAt    time.Time                      `json:"updated_at"`
+	DeletedAt    *gorm.DeletedAt                `json:"deleted_at"`
 }
 
 func ToUserRegisterResponse(user domain.UserModel, profile domain.ProfileUser, errorData error) (UserRegisterResponse, error) {
@@ -67,9 +67,9 @@ func ToUserRegisterResponse(user domain.UserModel, profile domain.ProfileUser, e
 	return loginResponse, errorData
 }
 
-func ToUserAccessResponse(user_access crudDomain.UserAccessMenuModel) crud.MenuMasterResponse {
+func ToUserAccessResponse(user_access crudDomain.UserAccessMenuModel) crud.MenuMasterUserResponse {
 
-	var userAccessResponse = crud.MenuMasterResponse{
+	var userAccessResponse = crud.MenuMasterUserResponse{
 		Id:         user_access.MenuId,
 		Name:       user_access.MenuMasterModel.Name,
 		Title:      user_access.MenuMasterModel.Title,
@@ -85,8 +85,8 @@ func ToUserAccessResponse(user_access crudDomain.UserAccessMenuModel) crud.MenuM
 	return userAccessResponse
 }
 
-func ToUserAccessResponses(user_access []crudDomain.UserAccessMenuModel, err error) ([]crud.MenuMasterResponse, error) {
-	var userAccessResponse []crud.MenuMasterResponse
+func ToUserAccessResponses(user_access []crudDomain.UserAccessMenuModel, err error) ([]crud.MenuMasterUserResponse, error) {
+	var userAccessResponse []crud.MenuMasterUserResponse
 	for _, access := range user_access {
 		userAccessResponse = append(userAccessResponse, ToUserAccessResponse(access))
 	}

@@ -7,11 +7,11 @@ import (
 	crudController "github.com/Ganasa18/document-be/internal/crud/controller"
 	crudRepository "github.com/Ganasa18/document-be/internal/crud/repository"
 	crudService "github.com/Ganasa18/document-be/internal/crud/service"
-	"github.com/go-playground/validator"
+	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
 )
 
-func InitializeModel(db *gorm.DB, validate *validator.Validate) (authController.AuthController, crudController.RoleController) {
+func InitializeModel(db *gorm.DB, validate *validator.Validate) (authController.AuthController, crudController.RoleController, crudController.MenuController) {
 	// Auth module
 	authRepo := authRepository.NewAuthRepository(db)
 	authSvc := authService.NewAuthService(authRepo, validate)
@@ -22,5 +22,10 @@ func InitializeModel(db *gorm.DB, validate *validator.Validate) (authController.
 	roleSvc := crudService.NewRoleService(roleRepo, validate)
 	roleCtrl := crudController.NewRoleController(roleSvc)
 
-	return authCtrl, roleCtrl
+	// Menu Module
+	menuRepo := crudRepository.NewMenuRepository(db)
+	menuSvc := crudService.NewMenuService(menuRepo, validate)
+	menuCtrl := crudController.NewMenuControllere(menuSvc)
+
+	return authCtrl, roleCtrl, menuCtrl
 }
