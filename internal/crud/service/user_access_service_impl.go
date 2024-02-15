@@ -1,8 +1,6 @@
 package service
 
 import (
-	"fmt"
-
 	"github.com/Ganasa18/document-be/internal/crud/model/domain"
 	"github.com/Ganasa18/document-be/internal/crud/model/web"
 	"github.com/Ganasa18/document-be/internal/crud/repository"
@@ -38,21 +36,20 @@ func (service *UserAccessServiceImpl) CreateUserAccess(ctx *gin.Context, request
 		Delete: request.Delete,
 	}
 
-	fmt.Println("USERACCESS", userAccess)
-
 	userAccessResponse, err := service.UserAccessRepository.CreateUserAccess(ctx, userAccess)
 
 	return web.ToUserAccessMasterResponseWithError(userAccessResponse, err)
 }
 
-// DeleteUserAccess implements UserAccessService.
 func (*UserAccessServiceImpl) DeleteUserAccess(ctx *gin.Context) {
 	panic("unimplemented")
 }
 
-// GetAllUserAccess implements UserAccessService.
-func (*UserAccessServiceImpl) GetAllUserAccess(ctx *gin.Context, pagination *helper.PaginationInput) {
-	panic("unimplemented")
+func (service *UserAccessServiceImpl) GetAllUserAccess(ctx *gin.Context, pagination *helper.PaginationInput) ([]web.UserAccessResponseJoinRoleAndMenu, int64, error) {
+	userAccessResponse, totalRow, err := service.UserAccessRepository.GetAllUserAccess(ctx, pagination)
+
+	return web.ToUserAccessMasterResponses(userAccessResponse, totalRow, err)
+
 }
 
 // GetUserAccessById implements UserAccessService.

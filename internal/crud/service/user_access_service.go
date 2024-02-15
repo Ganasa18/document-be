@@ -7,7 +7,7 @@ import (
 )
 
 type UserAccessService interface {
-	GetAllUserAccess(ctx *gin.Context, pagination *helper.PaginationInput)
+	GetAllUserAccess(ctx *gin.Context, pagination *helper.PaginationInput) ([]web.UserAccessResponseJoinRoleAndMenu, int64, error)
 	GetUserAccessById(ctx *gin.Context)
 	CreateUserAccess(ctx *gin.Context, userAccess web.UserAccessRequest) (web.UserAccessResponse, error)
 	UpdateUserAccess(ctx *gin.Context)

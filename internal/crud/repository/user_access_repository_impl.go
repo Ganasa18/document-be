@@ -44,8 +44,36 @@ func (*UserAccessRepositoryImpl) DeleteUserAccess(ctx *gin.Context) {
 	panic("unimplemented")
 }
 
-func (*UserAccessRepositoryImpl) GetAllUserAccess(ctx *gin.Context, pagination *helper.PaginationInput) {
-	panic("unimplemented")
+func (repository *UserAccessRepositoryImpl) GetAllUserAccess(ctx *gin.Context, pagination *helper.PaginationInput) (userAccess []domain.UserAccessMenuModel, totalRow int64, err error) {
+	totalRow = 0
+
+	offset := (pagination.Page - 1) * pagination.Limit
+	queryBuilder := repository.DB.Limit(pagination.Limit).Offset(offset)
+
+	// if pagination.Search != "" {
+	// 	queryBuilder = queryBuilder.Where("role_name ILIKE ?", "%"+pagination.Search+"%")
+	// }
+
+	// GET DATA
+	err = queryBuilder.Model(&domain.UserAccessMenuModel{}).Preload("RoleMasterModel").Preload("MenuMasterModel").Where("deleted_at IS NULL").Find(&userAccess).Error
+
+	if err != nil {
+		loghelper.Errorln(ctx, fmt.Sprintf("GetAllUserAccess | Error when Query builder list data, err:%s", err.Error()))
+		return userAccess, totalRow, err
+	}
+
+	// ROW COUNT
+	searchBuider := repository.DB.Model(&domain.UserAccessMenuModel{}).Where("deleted_at IS NULL")
+	// if pagination.Search != "" {
+	// 	searchBuider = searchBuider.Where("role_name ILIKE ?", "%"+pagination.Search+"%")
+	// }
+	errCount := searchBuider.Count(&totalRow).Error
+
+	if errCount != nil {
+		loghelper.Errorln(ctx, fmt.Sprintf("GetAllUserAccess | Error when Query builder count total rows, err:%s", errCount.Error()))
+		return userAccess, totalRow, errCount
+	}
+	return userAccess, totalRow, nil
 }
 
 func (*UserAccessRepositoryImpl) GetUserAccessById(ctx *gin.Context) {

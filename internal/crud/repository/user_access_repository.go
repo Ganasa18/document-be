@@ -7,7 +7,7 @@ import (
 )
 
 type UserAccessRepository interface {
-	GetAllUserAccess(ctx *gin.Context, pagination *helper.PaginationInput)
+	GetAllUserAccess(ctx *gin.Context, pagination *helper.PaginationInput) ([]domain.UserAccessMenuModel, int64, error)
 	GetUserAccessById(ctx *gin.Context)
 	CreateUserAccess(ctx *gin.Context, request domain.UserAccessMenuModel) (domain.UserAccessMenuModel, error)
 	UpdateUserAccess(ctx *gin.Context)
