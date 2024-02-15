@@ -36,7 +36,7 @@ type MenuMasterResponse struct {
 type MenuMasterRequest struct {
 	Name       string  `json:"name" validate:"required,lowercase"`
 	Title      string  `json:"title" validate:"required"`
-	Path       *string `json:"path" validate:"required"`
+	Path       *string `json:"path"`
 	IconName   *string `json:"icon_name" validate:"required"`
 	IsSubMenu  bool    `json:"is_submenu"`
 	ParentName *string `json:"parent_name"`
