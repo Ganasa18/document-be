@@ -72,7 +72,7 @@ func validationErrors(ctx *gin.Context, err interface{}) bool {
 		webResponse := web.WebResponse{
 			Code:   http.StatusBadRequest,
 			Status: "BAD REQUEST",
-			Data:   errorArray,
+			Data:   map[string]interface{}{"errors": errorArray},
 		}
 		helper.WriteToResponseBody(ctx, http.StatusBadRequest, webResponse)
 		return true

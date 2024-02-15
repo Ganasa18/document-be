@@ -23,5 +23,11 @@ func (h *HttpServe) setupRouter() {
 	v1.POST("/crud/menu", h.menuController.CreateMenu)
 	v1.PATCH("/crud/menu/:menuId", h.menuController.UpdateMenu)
 	v1.DELETE("/crud/menu/:menuId", h.menuController.DeleteMenu)
+	// USER ACCESS
+	v1.GET("/crud/user-access", h.userAccessController.GetAllUserAccess)
+	v1.GET("/crud/user-access/:userAccessId", h.userAccessController.GetUserAccessById)
+	v1.POST("/crud/user-access", h.userAccessController.CreateUserAccess)
+	v1.PATCH("/crud/user-access/:userAccessId", h.userAccessController.UpdateUserAccess)
+	v1.DELETE("/crud/user-access/:userAccessId", h.userAccessController.DeleteUserAccess)
 
 }

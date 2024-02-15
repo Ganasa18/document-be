@@ -11,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func InitializeModel(db *gorm.DB, validate *validator.Validate) (authController.AuthController, crudController.RoleController, crudController.MenuController) {
+func InitializeModel(db *gorm.DB, validate *validator.Validate) (authController.AuthController, crudController.RoleController, crudController.MenuController, crudController.UserAccessController) {
 	// Auth module
 	authRepo := authRepository.NewAuthRepository(db)
 	authSvc := authService.NewAuthService(authRepo, validate)
@@ -27,5 +27,10 @@ func InitializeModel(db *gorm.DB, validate *validator.Validate) (authController.
 	menuSvc := crudService.NewMenuService(menuRepo, validate)
 	menuCtrl := crudController.NewMenuControllere(menuSvc)
 
-	return authCtrl, roleCtrl, menuCtrl
+	// User Access Module
+	userAccessRepo := crudRepository.NewUserAccessRepository(db)
+	userAccessSvc := crudService.NewUserAccessService(userAccessRepo, validate)
+	userAccessCtrl := crudController.NewUserAccessControllere(userAccessSvc)
+
+	return authCtrl, roleCtrl, menuCtrl, userAccessCtrl
 }

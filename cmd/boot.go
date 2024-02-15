@@ -18,14 +18,14 @@ func initHTTP() error {
 	validate := validator.New()
 
 	// auth definition
-	authCtrl, roleCtrl, menuCtrl := server.InitializeModel(db, validate)
+	authCtrl, roleCtrl, menuCtrl, userAccessCtrl := server.InitializeModel(db, validate)
 
 	if err != nil {
 		utils.IsErrorDoPanic(err)
 	}
 
 	// run server
-	err = server.RunHttpServer(appConf, authCtrl, roleCtrl, menuCtrl)
+	err = server.RunHttpServer(appConf, authCtrl, roleCtrl, menuCtrl, userAccessCtrl)
 	if err != nil {
 		utils.IsErrorDoPanic(err)
 	}
