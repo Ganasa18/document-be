@@ -43,6 +43,13 @@ type UserAccessRequest struct {
 	Delete bool `json:"delete"`
 }
 
+type UserAccessRequestEdit struct {
+	Create bool `json:"create"`
+	Read   bool `json:"read"`
+	Update bool `json:"update"`
+	Delete bool `json:"delete"`
+}
+
 func ToUserAccessMasterResponseWithError(userAccess domain.UserAccessMenuModel, err error) (UserAccessResponse, error) {
 	var userAccessResponse = UserAccessResponse{
 		Id:        userAccess.Id,

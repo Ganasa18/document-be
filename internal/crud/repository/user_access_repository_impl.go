@@ -81,8 +81,23 @@ func (repository *UserAccessRepositoryImpl) GetUserAccessById(ctx *gin.Context, 
 	return userAccess, nil
 }
 
-func (*UserAccessRepositoryImpl) UpdateUserAccess(ctx *gin.Context) {
-	panic("unimplemented")
+func (repository *UserAccessRepositoryImpl) UpdateUserAccess(ctx *gin.Context, userAccess domain.UserAccessMenuModel, id int) (domain.UserAccessMenuModel, error) {
+	// Check if the user access
+	if err := repository.checkIfUserAccessExists(ctx, id); err != nil {
+		return userAccess, err
+	}
+
+	// Update the user access
+	if err := repository.updateUserAccess(ctx, id, userAccess); err != nil {
+		return userAccess, err
+	}
+
+	// Retrieve the updated user access
+	if err := repository.getUpdatedUserAccess(ctx, id, &userAccess); err != nil {
+		return userAccess, err
+	}
+
+	return userAccess, nil
 }
 
 func (repository *UserAccessRepositoryImpl) DeleteUserAccess(ctx *gin.Context, id int) error {
@@ -101,5 +116,37 @@ func (repository *UserAccessRepositoryImpl) DeleteUserAccess(ctx *gin.Context, i
 		return errors.New("failed to delete user access")
 	}
 
+	return nil
+}
+
+func (repository *UserAccessRepositoryImpl) checkIfUserAccessExists(ctx *gin.Context, id int) error {
+	err := repository.DB.First(&domain.UserAccessMenuModel{}, id).Error
+	if err != nil {
+		loghelper.Errorln(ctx, fmt.Sprintf("UpdateUserAccess | Error when querying data, err:%s", err.Error()))
+		return errors.New("user access not found")
+	}
+	return nil
+}
+
+func (repository *UserAccessRepositoryImpl) updateUserAccess(ctx *gin.Context, id int, userAccess domain.UserAccessMenuModel) error {
+
+	updateFields := map[string]interface{}{"create": userAccess.Create, "read": userAccess.Read, "update": userAccess.Update, "delete": userAccess.Delete}
+
+	err := repository.DB.Model(&userAccess).
+		Where("id = ?", id).
+		Updates(updateFields).Error
+	if err != nil {
+		loghelper.Errorln(ctx, fmt.Sprintf("UpdateUserAccess | Error when updating data, err:%s", err.Error()))
+		return errors.New("failed to update user access")
+	}
+	return nil
+}
+
+func (repository *UserAccessRepositoryImpl) getUpdatedUserAccess(ctx *gin.Context, id int, userAccess *domain.UserAccessMenuModel) error {
+	err := repository.DB.First(userAccess, id).Error
+	if err != nil {
+		loghelper.Errorln(ctx, fmt.Sprintf("UpdateUserAccess | Error when querying updated data, err:%s", err.Error()))
+		return errors.New("failed to get updated user access")
+	}
 	return nil
 }

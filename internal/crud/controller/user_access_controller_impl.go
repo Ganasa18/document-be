@@ -97,8 +97,30 @@ func (controller *UserAccessControllerImpl) GetUserAccessById(ctx *gin.Context) 
 	helper.WriteToResponseBody(ctx, http.StatusOK, webResponse)
 }
 
-func (*UserAccessControllerImpl) UpdateUserAccess(ctx *gin.Context) {
-	panic("unimplemented")
+func (controller *UserAccessControllerImpl) UpdateUserAccess(ctx *gin.Context) {
+	userAccessRequest := web.UserAccessRequestEdit{}
+	helper.ReadFromRequestBody(ctx.Request, &userAccessRequest)
+
+	userAccessResponse, err := controller.UserAccessService.UpdateUserAccess(ctx, userAccessRequest)
+
+	var statusCode int
+	var responseData interface{}
+
+	if err != nil {
+		statusCode = http.StatusBadRequest
+		responseData = err.Error()
+	} else {
+		statusCode = http.StatusOK
+		responseData = userAccessResponse
+	}
+
+	webResponse := response.WebResponse{
+		Code:   statusCode,
+		Status: http.StatusText(statusCode),
+		Data:   responseData,
+	}
+
+	helper.WriteToResponseBody(ctx, statusCode, webResponse)
 }
 
 func (controller *UserAccessControllerImpl) DeleteUserAccess(ctx *gin.Context) {

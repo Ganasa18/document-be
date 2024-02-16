@@ -63,8 +63,31 @@ func (service *UserAccessServiceImpl) GetUserAccessById(ctx *gin.Context) web.Us
 	return web.ToUserAccessMasterResponse(roleResponse)
 }
 
-func (*UserAccessServiceImpl) UpdateUserAccess(ctx *gin.Context) {
-	panic("unimplemented")
+func (service *UserAccessServiceImpl) UpdateUserAccess(ctx *gin.Context, request web.UserAccessRequestEdit) (web.UserAccessResponse, error) {
+	err := service.Validate.Struct(request)
+	utils.PanicIfError(err)
+
+	userAccessId := ctx.Params.ByName("userAccessId")
+	id, err := strconv.Atoi(userAccessId)
+	utils.PanicIfError(err)
+
+	// LOGIC
+	userAccess := domain.UserAccessMenuModel{
+		Create: request.Create,
+		Read:   request.Read,
+		Update: request.Update,
+		Delete: request.Delete,
+	}
+
+	userAccessResponse, err := service.UserAccessRepository.UpdateUserAccess(ctx, userAccess, id)
+
+	if err != nil {
+		if err.Error() == "user access not found" {
+			panic(exception.NewNotFoundError(err.Error()))
+		}
+	}
+
+	return web.ToUserAccessMasterResponseWithError(userAccessResponse, err)
 }
 
 func (service *UserAccessServiceImpl) DeleteUserAccess(ctx *gin.Context) error {

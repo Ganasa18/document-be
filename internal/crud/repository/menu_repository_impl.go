@@ -122,15 +122,9 @@ func (repository *MenuRepositoryImpl) checkIfMenuExists(ctx *gin.Context, id int
 
 func (repository *MenuRepositoryImpl) updateMenuFields(ctx *gin.Context, id int, menu domain.MenuMasterModel) error {
 
-	updateFields := domain.MenuUpdate{
-		Name:      menu.Name,
-		Title:     menu.Title,
-		Path:      menu.Path,
-		IconName:  menu.IconName,
-		IsSubMenu: menu.IsSubMenu,
-	}
+	updateFields := map[string]interface{}{"name": menu.Name, "title": menu.Title, "path": menu.Path, "icon_name": menu.IconName, "is_sub_menu": menu.IsSubMenu}
 
-	err := repository.DB.Model(&domain.MenuMasterModel{}).
+	err := repository.DB.Model(&menu).
 		Where("id = ?", id).
 		Updates(updateFields).Error
 	if err != nil {
