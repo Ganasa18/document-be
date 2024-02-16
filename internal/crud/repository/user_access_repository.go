@@ -8,8 +8,8 @@ import (
 
 type UserAccessRepository interface {
 	GetAllUserAccess(ctx *gin.Context, pagination *helper.PaginationInput) ([]domain.UserAccessMenuModel, int64, error)
-	GetUserAccessById(ctx *gin.Context)
+	GetUserAccessById(ctx *gin.Context, id int) (domain.UserAccessMenuModel, error)
 	CreateUserAccess(ctx *gin.Context, request domain.UserAccessMenuModel) (domain.UserAccessMenuModel, error)
 	UpdateUserAccess(ctx *gin.Context)
-	DeleteUserAccess(ctx *gin.Context)
+	DeleteUserAccess(ctx *gin.Context, id int) error
 }

@@ -48,10 +48,6 @@ func (controller *UserAccessControllerImpl) CreateUserAccess(ctx *gin.Context) {
 	helper.WriteToResponseBody(ctx, statusCode, webResponse)
 }
 
-func (*UserAccessControllerImpl) DeleteUserAccess(ctx *gin.Context) {
-	panic("unimplemented")
-}
-
 func (controller *UserAccessControllerImpl) GetAllUserAccess(ctx *gin.Context) {
 	pagination := helper.Pagination(ctx)
 	menuResponse, totalRow, err := controller.UserAccessService.GetAllUserAccess(ctx, &pagination)
@@ -89,10 +85,41 @@ func (controller *UserAccessControllerImpl) GetAllUserAccess(ctx *gin.Context) {
 	helper.WriteToResponseBody(ctx, statusCode, webResponse)
 }
 
-func (*UserAccessControllerImpl) GetUserAccessById(ctx *gin.Context) {
-	panic("unimplemented")
+func (controller *UserAccessControllerImpl) GetUserAccessById(ctx *gin.Context) {
+	userAccessResponse := controller.UserAccessService.GetUserAccessById(ctx)
+
+	webResponse := response.WebResponse{
+		Code:   http.StatusOK,
+		Status: http.StatusText(http.StatusOK),
+		Data:   userAccessResponse,
+	}
+
+	helper.WriteToResponseBody(ctx, http.StatusOK, webResponse)
 }
 
 func (*UserAccessControllerImpl) UpdateUserAccess(ctx *gin.Context) {
 	panic("unimplemented")
+}
+
+func (controller *UserAccessControllerImpl) DeleteUserAccess(ctx *gin.Context) {
+	err := controller.UserAccessService.DeleteUserAccess(ctx)
+
+	var statusCode int
+	var responseData interface{}
+
+	if err != nil {
+		statusCode = http.StatusBadRequest
+		responseData = err.Error()
+	} else {
+		statusCode = http.StatusOK
+		responseData = "success deleted"
+	}
+
+	webResponse := response.WebResponse{
+		Code:   statusCode,
+		Status: http.StatusText(statusCode),
+		Data:   responseData,
+	}
+
+	helper.WriteToResponseBody(ctx, statusCode, webResponse)
 }

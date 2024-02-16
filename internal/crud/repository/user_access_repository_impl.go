@@ -40,10 +40,6 @@ func (repository *UserAccessRepositoryImpl) CreateUserAccess(ctx *gin.Context, u
 
 }
 
-func (*UserAccessRepositoryImpl) DeleteUserAccess(ctx *gin.Context) {
-	panic("unimplemented")
-}
-
 func (repository *UserAccessRepositoryImpl) GetAllUserAccess(ctx *gin.Context, pagination *helper.PaginationInput) (userAccess []domain.UserAccessMenuModel, totalRow int64, err error) {
 	totalRow = 0
 
@@ -76,10 +72,34 @@ func (repository *UserAccessRepositoryImpl) GetAllUserAccess(ctx *gin.Context, p
 	return userAccess, totalRow, nil
 }
 
-func (*UserAccessRepositoryImpl) GetUserAccessById(ctx *gin.Context) {
-	panic("unimplemented")
+func (repository *UserAccessRepositoryImpl) GetUserAccessById(ctx *gin.Context, id int) (userAccess domain.UserAccessMenuModel, err error) {
+	err = repository.DB.Model(&domain.UserAccessMenuModel{}).First(&userAccess, id).Error
+	if err != nil {
+		loghelper.Errorln(ctx, fmt.Sprintf("GetUserAccessById | Error when Query builder get data, err:%s", err.Error()))
+		return userAccess, errors.New("user access not found")
+	}
+	return userAccess, nil
 }
 
 func (*UserAccessRepositoryImpl) UpdateUserAccess(ctx *gin.Context) {
 	panic("unimplemented")
+}
+
+func (repository *UserAccessRepositoryImpl) DeleteUserAccess(ctx *gin.Context, id int) error {
+	userAccess := &domain.UserAccessMenuModel{Id: id}
+
+	err := repository.DB.First(&domain.UserAccessMenuModel{}, id).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return errors.New("user access not found")
+	}
+
+	err = repository.DB.Unscoped().Delete(userAccess).Error
+
+	if err != nil {
+		loghelper.Errorln(ctx, fmt.Sprintf("DeleteUserAccess | Error when deleting user access, err: %s", err.Error()))
+		return errors.New("failed to delete user access")
+	}
+
+	return nil
 }
