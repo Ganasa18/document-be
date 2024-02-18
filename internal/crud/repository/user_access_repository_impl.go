@@ -44,11 +44,7 @@ func (repository *UserAccessRepositoryImpl) GetAllUserAccess(ctx *gin.Context, p
 	totalRow = 0
 
 	offset := (pagination.Page - 1) * pagination.Limit
-	queryBuilder := repository.DB.Limit(pagination.Limit).Offset(offset)
-
-	// if pagination.Search != "" {
-	// 	queryBuilder = queryBuilder.Where("role_name ILIKE ?", "%"+pagination.Search+"%")
-	// }
+	queryBuilder := repository.DB.Limit(pagination.Limit).Offset(offset).Order(pagination.OrderBy)
 
 	// GET DATA
 	err = queryBuilder.Model(&domain.UserAccessMenuModel{}).Preload("RoleMasterModel").Preload("MenuMasterModel").Where("deleted_at IS NULL").Find(&userAccess).Error
@@ -60,9 +56,7 @@ func (repository *UserAccessRepositoryImpl) GetAllUserAccess(ctx *gin.Context, p
 
 	// ROW COUNT
 	searchBuider := repository.DB.Model(&domain.UserAccessMenuModel{}).Where("deleted_at IS NULL")
-	// if pagination.Search != "" {
-	// 	searchBuider = searchBuider.Where("role_name ILIKE ?", "%"+pagination.Search+"%")
-	// }
+
 	errCount := searchBuider.Count(&totalRow).Error
 
 	if errCount != nil {

@@ -35,7 +35,7 @@ func (repository *MenuRepositoryImpl) GetAllMenu(ctx *gin.Context, pagination *h
 	totalRow = 0
 
 	offset := (pagination.Page - 1) * pagination.Limit
-	queryBuilder := repository.DB.Limit(pagination.Limit).Offset(offset)
+	queryBuilder := repository.DB.Limit(pagination.Limit).Offset(offset).Order(pagination.OrderBy)
 
 	if pagination.Search != "" {
 		queryBuilder = queryBuilder.Where("name ILIKE ?", "%"+pagination.Search+"%")

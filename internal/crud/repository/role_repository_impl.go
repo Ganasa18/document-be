@@ -99,7 +99,7 @@ func (repository *RoleRepositoryImpl) GetRoles(ctx context.Context, pagination *
 	totalRow = 0
 
 	offset := (pagination.Page - 1) * pagination.Limit
-	queryBuilder := repository.DB.Limit(pagination.Limit).Offset(offset)
+	queryBuilder := repository.DB.Limit(pagination.Limit).Offset(offset).Order(pagination.OrderBy)
 
 	if pagination.Search != "" {
 		queryBuilder = queryBuilder.Where("role_name ILIKE ?", "%"+pagination.Search+"%")

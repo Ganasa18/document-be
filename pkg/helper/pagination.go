@@ -7,15 +7,17 @@ import (
 )
 
 type PaginationInput struct {
-	Limit  int    `json:"limit"`
-	Page   int    `json:"page"`
-	Search string `json:"search"`
+	Limit   int    `json:"limit"`
+	Page    int    `json:"page"`
+	Search  string `json:"search"`
+	OrderBy string `json:"orderBy"`
 }
 
 func Pagination(ctx *gin.Context) PaginationInput {
 	limit := 10
 	page := 1
 	search := ""
+	orderBy := "created_at desc"
 
 	query := ctx.Request.URL.Query()
 
@@ -28,12 +30,15 @@ func Pagination(ctx *gin.Context) PaginationInput {
 			page, _ = strconv.Atoi(queryValue)
 		case "search":
 			search = queryValue
+		case "orderBy":
+			orderBy = queryValue
 		}
 	}
 
 	return PaginationInput{
-		Limit:  limit,
-		Page:   page,
-		Search: search,
+		Limit:   limit,
+		Page:    page,
+		Search:  search,
+		OrderBy: orderBy,
 	}
 }
