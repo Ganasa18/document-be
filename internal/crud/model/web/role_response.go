@@ -16,7 +16,7 @@ type RoleMasterResponse struct {
 }
 
 type RoleMasterRequest struct {
-	RoleName string `validate:"required,min=1,alpha" json:"role_name"`
+	RoleName string `validate:"required,min=1" json:"role_name"`
 }
 
 type RoleMasterResponseJoin struct {
