@@ -40,14 +40,18 @@ func (service *AuthServiceImpl) LoginOrRegister(ctx *gin.Context, request web.Us
 	err := service.Validate.Struct(request)
 	utils.PanicIfError(err)
 	var passwordData string
+	var TypeAction string
 
 	// GENERATE UUID
 	uniqueID := uuid.New().String()
 
-	roleDefault := 1
-
 	// LOGIC
+	roleDefault := 1
 	OpenId := request.OpenId
+	if request.TypeAction != nil {
+		TypeAction = *request.TypeAction
+	}
+
 	register := domain.UserModel{
 		UserUniqueId: uniqueID,
 		Email:        request.Email,
@@ -55,6 +59,10 @@ func (service *AuthServiceImpl) LoginOrRegister(ctx *gin.Context, request web.Us
 		OpenId:       request.OpenId,
 		RoleId:       &roleDefault,
 		Username:     request.Username,
+	}
+
+	if OpenId != utils.OPEN_API_GOOGLE && OpenId != utils.OPEN_API_EMAIL {
+		return web.UserRegisterResponse{}, errors.New("open id must valid provide")
 	}
 
 	if register.Password == nil && OpenId != utils.OPEN_API_GOOGLE {
@@ -66,7 +74,7 @@ func (service *AuthServiceImpl) LoginOrRegister(ctx *gin.Context, request web.Us
 		}
 	}
 
-	data, err := service.AuthRepository.LoginOrRegister(ctx, register, OpenId)
+	data, err := service.AuthRepository.LoginOrRegister(ctx, register, OpenId, TypeAction)
 
 	profile := domain.ProfileUser{
 		UserId:       data.Id,

@@ -15,6 +15,7 @@ type UserRegisterRequest struct {
 	OpenId       string  `validate:"required" json:"open_id"`
 	Username     *string `json:"username"`
 	ProfileImage *string `json:"profile_image"`
+	TypeAction   *string `json:"type_action"`
 }
 
 type ProfileUserResponse struct {

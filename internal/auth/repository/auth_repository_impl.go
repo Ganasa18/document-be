@@ -23,12 +23,13 @@ func NewAuthRepository(db *gorm.DB) AuthRepository {
 	}
 }
 
-func (repository *AuthRepositoryImpl) LoginOrRegister(ctx context.Context, user domain.UserModel, OpenId string) (domain.UserModel, error) {
+func (repository *AuthRepositoryImpl) LoginOrRegister(ctx context.Context, user domain.UserModel, OpenId string, TypeAction string) (domain.UserModel, error) {
 	var plainPassword string
 	if OpenId != utils.OPEN_API_GOOGLE {
 		plainPassword = *user.Password
 	}
 
+	// Check user exist
 	err := repository.DB.Where(domain.UserModel{Email: user.Email, OpenId: user.OpenId}).First(&user).Error
 
 	// GET USER ROLE
@@ -36,6 +37,14 @@ func (repository *AuthRepositoryImpl) LoginOrRegister(ctx context.Context, user 
 
 	// REGISTER USER
 	if err != nil {
+		// Check user exist login type
+
+		if TypeAction != "" && TypeAction == utils.TYPE_ACTION_LOGIN {
+			if err == gorm.ErrRecordNotFound {
+				return user, errors.New("user not register, please register before")
+			}
+		}
+
 		loghelper.Errorln(ctx, fmt.Sprintf("LoginOrRegister | Error fetching the user, err:%s", err.Error()))
 
 		if OpenId != utils.OPEN_API_GOOGLE {
