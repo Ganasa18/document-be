@@ -44,7 +44,7 @@ func (controller *AuthControllerImpl) LoginOrRegister(ctx *gin.Context) {
 		utils.PanicIfError(err)
 
 		// Create a new cookie
-		ctx.SetCookie("token", tokenString, 24*3600, "/", "", false, true)
+		ctx.SetCookie(utils.COOKIE_TOKEN, tokenString, 24*3600, "/", "", false, true)
 
 		registerResponse.Token = &tokenString
 		registerResponse.Menu = &userMenu
@@ -118,4 +118,32 @@ func (controller *AuthControllerImpl) ResetPasswordUser(ctx *gin.Context) {
 	}
 
 	helper.WriteToResponseBody(ctx, statusCode, webResponse)
+}
+
+func (controller *AuthControllerImpl) UpdateUserRole(ctx *gin.Context) {
+
+	requestUpdateUserAccess := web.UpdateUserAccessRequest{}
+	helper.ReadFromRequestBody(ctx.Request, &requestUpdateUserAccess)
+
+	responseUpdate, err := controller.AuthService.UpdateUserRole(ctx, requestUpdateUserAccess)
+
+	var statusCode int
+	var responseData interface{}
+
+	if err != nil {
+		statusCode = http.StatusBadRequest
+		responseData = err.Error()
+	} else {
+		statusCode = http.StatusOK
+		responseData = responseUpdate
+	}
+
+	webResponse := response.WebResponse{
+		Code:   statusCode,
+		Status: http.StatusText(statusCode),
+		Data:   responseData,
+	}
+
+	helper.WriteToResponseBody(ctx, statusCode, webResponse)
+
 }

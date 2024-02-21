@@ -36,7 +36,7 @@ func NewAuthService(authRepository repository.AuthRepository, validate *validato
 	}
 }
 
-func (service *AuthServiceImpl) LoginOrRegister(ctx *gin.Context, request web.UserRegisterRequest) (web.UserRegisterResponse, error) {
+func (service *AuthServiceImpl) LoginOrRegister(ctx *gin.Context, request web.UserRegisterRequest) (web.UserBaseResponse, error) {
 	err := service.Validate.Struct(request)
 	utils.PanicIfError(err)
 	var passwordData string
@@ -62,7 +62,7 @@ func (service *AuthServiceImpl) LoginOrRegister(ctx *gin.Context, request web.Us
 	}
 
 	if OpenId != utils.OPEN_API_GOOGLE && OpenId != utils.OPEN_API_EMAIL {
-		return web.UserRegisterResponse{}, errors.New("open id must valid provide")
+		return web.UserBaseResponse{}, errors.New("open id must valid provide")
 	}
 
 	if register.Password == nil && OpenId != utils.OPEN_API_GOOGLE {
@@ -70,7 +70,7 @@ func (service *AuthServiceImpl) LoginOrRegister(ctx *gin.Context, request web.Us
 			passwordData = request.Password
 			register.Password = &passwordData
 		} else {
-			return web.UserRegisterResponse{}, errors.New("password must be provided")
+			return web.UserBaseResponse{}, errors.New("password must be provided")
 		}
 	}
 
@@ -85,7 +85,7 @@ func (service *AuthServiceImpl) LoginOrRegister(ctx *gin.Context, request web.Us
 	profileRes, errProfile := service.AuthRepository.CreateOrGetProfile(ctx, profile)
 	utils.PanicIfError(errProfile)
 
-	return web.ToUserRegisterResponse(data, profileRes, err)
+	return web.ToUserBaseResponse(data, profileRes, err)
 
 }
 
@@ -186,4 +186,26 @@ func (service *AuthServiceImpl) GetUserMenu(ctx *gin.Context, RoleId int) ([]cru
 	utils.PanicIfError(err)
 
 	return web.ToUserAccessResponses(user_access, err)
+}
+
+func (service *AuthServiceImpl) UpdateUserRole(ctx *gin.Context, request web.UpdateUserAccessRequest) (web.UserBaseResponse, error) {
+	err := service.Validate.Struct(request)
+	utils.PanicIfError(err)
+
+	cookie, err := ctx.Cookie(utils.COOKIE_TOKEN)
+	utils.PanicIfError(err)
+	valueToken, err := helper.ValidateToken(cookie)
+	utils.PanicIfError(err)
+	adminToken := valueToken.UserID
+
+	user := domain.UserModel{
+		RoleId:       &request.UserRole,
+		UserUniqueId: request.UserUniqueId,
+	}
+
+	data, err := service.AuthRepository.UpdateUserRole(ctx, user, adminToken)
+
+	fmt.Println(data, "SERVICE DATA")
+
+	return web.ToUserResponse(data, err)
 }

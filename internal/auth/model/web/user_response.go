@@ -24,7 +24,7 @@ type ProfileUserResponse struct {
 	ProfileImage *string `json:"profile_image"`
 }
 
-type UserRegisterResponse struct {
+type UserBaseResponse struct {
 	Token        *string                        `json:"token"`
 	Id           int                            `json:"id"`
 	OpenId       string                         `json:"open_id"`
@@ -33,14 +33,14 @@ type UserRegisterResponse struct {
 	Email        string                         `json:"email"`
 	IsActive     bool                           `json:"is_active"`
 	Role         crud.RoleMasterResponseJoin    `json:"role"`
-	Profile      ProfileUserResponse            `json:"profile"`
+	Profile      *ProfileUserResponse           `json:"profile"`
 	Menu         *[]crud.MenuMasterUserResponse `json:"user_menu"`
 	CreatedAt    time.Time                      `json:"created_at"`
 	UpdatedAt    time.Time                      `json:"updated_at"`
 	DeletedAt    *gorm.DeletedAt                `json:"deleted_at"`
 }
 
-func ToUserRegisterResponse(user domain.UserModel, profile domain.ProfileUser, errorData error) (UserRegisterResponse, error) {
+func ToUserBaseResponse(user domain.UserModel, profile domain.ProfileUser, errorData error) (UserBaseResponse, error) {
 
 	userRole := crud.RoleMasterResponseJoin{
 		Id:       user.RoleMasterModel.Id,
@@ -53,19 +53,39 @@ func ToUserRegisterResponse(user domain.UserModel, profile domain.ProfileUser, e
 		ProfileImage: profile.ProfileImage,
 	}
 
-	loginResponse := UserRegisterResponse{
+	loginResponse := UserBaseResponse{
 		Id:           user.Id,
 		OpenId:       user.OpenId,
 		UserUniqueId: user.UserUniqueId,
 		Email:        user.Email,
 		Username:     user.Username,
 		Role:         userRole,
-		Profile:      userProfile,
+		Profile:      &userProfile,
 		CreatedAt:    user.CreatedAt,
 		UpdatedAt:    user.UpdatedAt,
 	}
 
 	return loginResponse, errorData
+}
+
+func ToUserResponse(user domain.UserModel, errorData error) (UserBaseResponse, error) {
+
+	userRole := crud.RoleMasterResponseJoin{
+		Id:       user.RoleMasterModel.Id,
+		RoleName: user.RoleMasterModel.RoleName,
+	}
+
+	userResponse := UserBaseResponse{
+		OpenId:       user.OpenId,
+		UserUniqueId: user.UserUniqueId,
+		Email:        user.Email,
+		Username:     user.Username,
+		Role:         userRole,
+		CreatedAt:    user.CreatedAt,
+		UpdatedAt:    user.UpdatedAt,
+	}
+
+	return userResponse, errorData
 }
 
 func ToUserAccessResponse(user_access crudDomain.UserAccessMenuModel) crud.MenuMasterUserResponse {

@@ -7,8 +7,9 @@ import (
 )
 
 type AuthService interface {
-	LoginOrRegister(ctx *gin.Context, request web.UserRegisterRequest) (web.UserRegisterResponse, error)
+	LoginOrRegister(ctx *gin.Context, request web.UserRegisterRequest) (web.UserBaseResponse, error)
 	ForgotLinkPassword(ctx *gin.Context, request web.ForgotPasswordRequest) (string, error)
 	ResetPasswordUser(ctx *gin.Context, request web.ResetPasswordRequest) error
 	GetUserMenu(ctx *gin.Context, RoleId int) ([]crud.MenuMasterUserResponse, error)
+	UpdateUserRole(ctx *gin.Context, request web.UpdateUserAccessRequest) (web.UserBaseResponse, error)
 }

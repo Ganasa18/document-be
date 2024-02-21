@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+	"strconv"
 
 	"github.com/Ganasa18/document-be/internal/auth/model/domain"
 	crudDomain "github.com/Ganasa18/document-be/internal/crud/model/domain"
@@ -184,4 +186,40 @@ func (repository *AuthRepositoryImpl) GetUserMenu(ctx context.Context, RoleId in
 	}
 
 	return user_access, nil
+}
+
+func (repository *AuthRepositoryImpl) UpdateUserRole(ctx context.Context, user domain.UserModel, adminToken string) (domain.UserModel, error) {
+
+	adminUser := domain.UserModel{}
+
+	err := repository.DB.Where(domain.UserModel{UserUniqueId: adminToken}).Find(&adminUser).Error
+	if err != nil {
+		return domain.UserModel{}, errors.New("failed to get user access")
+	}
+
+	// CHECK ADMIN
+	idAdmin, err := strconv.Atoi(os.Getenv(utils.CONFIG_ADMIN_ID))
+	if err != nil {
+		return domain.UserModel{}, errors.New("env admin not setted")
+	}
+
+	if *adminUser.RoleId != idAdmin {
+		return domain.UserModel{}, errors.New("user does not have privilege to update role")
+	}
+
+	// UPDATE ROLE
+	err = repository.DB.Model(&domain.UserModel{}).Where("user_unique_id = ?", user.UserUniqueId).Updates(map[string]interface{}{"role_id": *user.RoleId}).Error
+
+	fmt.Println(err, "ERROR UPDATE")
+	if err != nil {
+		return domain.UserModel{}, errors.New("failed to update data")
+	}
+
+	// GET RETURN DATA
+	err = repository.DB.Where(domain.UserModel{UserUniqueId: user.UserUniqueId}).Preload("RoleMasterModel").First(&user).Error
+	if err != nil {
+		return domain.UserModel{}, errors.New("failed to get user data")
+	}
+
+	return user, nil
 }

@@ -10,6 +10,7 @@ const (
 	OPEN_API_EMAIL                = "email"
 	TYPE_ACTION_LOGIN             = "login"
 	HEADER_AUTHORIZATION          = "Authorization"
+	COOKIE_TOKEN                  = "token"
 
 	CONFIG_APP_URL     = "APP_URL"
 	CONFIG_APP_ENV     = "APP_ENV"
@@ -32,4 +33,5 @@ const (
 
 	CONFIG_JWT_SECRET_ACCESS_TOKEN  = "JWT_SECRET_ACCESS_TOKEN"
 	CONFIG_AUTH_EXPIRE_ACCESS_TOKEN = "AUTH_EXPIRE_ACCESS_TOKEN"
+	CONFIG_ADMIN_ID                 = "ADMIN_ID"
 )

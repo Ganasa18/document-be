@@ -8,9 +8,11 @@ func (h *HttpServe) setupRouter() {
 	v1.POST("/login-or-register", h.authController.LoginOrRegister)
 	v1.POST("/forgot-password", h.authController.ForgotLinkPassword)
 	v1.POST("/reset-password", h.authController.ResetPasswordUser)
+	v1.POST("/change-role", h.authController.UpdateUserRole)
 
 	// WITH AUTHORZATION
 	v1.Use(middleware.CustomAuthMiddleware())
+
 	// ROLE MASTER
 	v1.GET("/crud/role", h.roleController.GetRoles)
 	v1.GET("/crud/role/:roleId", h.roleController.GetRoleById)

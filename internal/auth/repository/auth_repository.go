@@ -14,4 +14,5 @@ type AuthRepository interface {
 	ExpiredForgotPassword(ctx context.Context, forgotData domain.ForgotPasswordLink) error
 	ResetPasswordUser(ctx context.Context, user domain.UserModel, hashId string) error
 	GetUserMenu(ctx context.Context, RoleId int) ([]crudDomain.UserAccessMenuModel, error)
+	UpdateUserRole(ctx context.Context, user domain.UserModel, adminToken string) (domain.UserModel, error)
 }
