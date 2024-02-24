@@ -3,6 +3,10 @@ package server
 import "github.com/Ganasa18/document-be/pkg/middleware"
 
 func (h *HttpServe) setupRouter() {
+
+	h.router.GET("/ws", h.webSocketController.HandlerWebSocketController)
+	go h.webSocketController.HandleMessages()
+
 	v1 := h.router.Group("/api/v1")
 	// AUTH
 	v1.POST("/login-or-register", h.authController.LoginOrRegister)

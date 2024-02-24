@@ -4,6 +4,7 @@ import (
 	appconfig "github.com/Ganasa18/document-be/config"
 	authController "github.com/Ganasa18/document-be/internal/auth/controller"
 	crudController "github.com/Ganasa18/document-be/internal/crud/controller"
+	webSocketController "github.com/Ganasa18/document-be/internal/websocket/controller"
 	"github.com/Ganasa18/document-be/pkg/exception"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -15,10 +16,11 @@ type HttpServe struct {
 	roleController       crudController.RoleController
 	menuController       crudController.MenuController
 	userAccessController crudController.UserAccessController
+	webSocketController  webSocketController.WebSocketController
 }
 
 func RunHttpServer(appConf *appconfig.Config, authController authController.AuthController, roleController crudController.RoleController, menuController crudController.MenuController,
-	userAccessController crudController.UserAccessController,
+	userAccessController crudController.UserAccessController, webSocketController webSocketController.WebSocketController,
 
 ) error {
 	var hs HttpServe
@@ -41,6 +43,7 @@ func RunHttpServer(appConf *appconfig.Config, authController authController.Auth
 	hs.roleController = roleController
 	hs.menuController = menuController
 	hs.userAccessController = userAccessController
+	hs.webSocketController = webSocketController
 	hs.setupRouter()
 
 	return hs.router.Run(appConf.AppUrl + ":" + appConf.AppPort)

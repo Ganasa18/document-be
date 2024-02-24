@@ -7,11 +7,12 @@ import (
 	crudController "github.com/Ganasa18/document-be/internal/crud/controller"
 	crudRepository "github.com/Ganasa18/document-be/internal/crud/repository"
 	crudService "github.com/Ganasa18/document-be/internal/crud/service"
+	wsController "github.com/Ganasa18/document-be/internal/websocket/controller"
 	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
 )
 
-func InitializeModel(db *gorm.DB, validate *validator.Validate) (authController.AuthController, crudController.RoleController, crudController.MenuController, crudController.UserAccessController) {
+func InitializeModel(db *gorm.DB, validate *validator.Validate) (authController.AuthController, crudController.RoleController, crudController.MenuController, crudController.UserAccessController, wsController.WebSocketController) {
 	// Auth module
 	authRepo := authRepository.NewAuthRepository(db)
 	authSvc := authService.NewAuthService(authRepo, validate)
@@ -32,5 +33,8 @@ func InitializeModel(db *gorm.DB, validate *validator.Validate) (authController.
 	userAccessSvc := crudService.NewUserAccessService(userAccessRepo, validate)
 	userAccessCtrl := crudController.NewUserAccessControllere(userAccessSvc)
 
-	return authCtrl, roleCtrl, menuCtrl, userAccessCtrl
+	// WebSocket Module
+	webSocketCtrl := wsController.NewWebSocketController()
+
+	return authCtrl, roleCtrl, menuCtrl, userAccessCtrl, webSocketCtrl
 }
