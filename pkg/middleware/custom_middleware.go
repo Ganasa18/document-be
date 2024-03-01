@@ -1,13 +1,16 @@
 package middleware
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/Ganasa18/document-be/internal/base/model/web"
 	"github.com/Ganasa18/document-be/pkg/helper"
 	"github.com/Ganasa18/document-be/pkg/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 func CustomAuthMiddleware() gin.HandlerFunc {
@@ -38,11 +41,14 @@ func CustomAuthMiddleware() gin.HandlerFunc {
 }
 
 func handleUnauthorized(ctx *gin.Context, message string) {
+	start := time.Now()
 	webResponse := web.WebResponse{
 		Code:   http.StatusUnauthorized,
 		Status: http.StatusText(http.StatusUnauthorized),
 		Data:   message,
 	}
 	helper.WriteToResponseBody(ctx, http.StatusUnauthorized, webResponse)
+	end := time.Since(start)
+	logrus.Infoln(fmt.Sprintf("METHOD: %s, URL: %s, RESPONSE: %s , LATENCY: %vms", ctx.Request.Method, ctx.Request.URL, message, end.Milliseconds()))
 	ctx.Abort()
 }
