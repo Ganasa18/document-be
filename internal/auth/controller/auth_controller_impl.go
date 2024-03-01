@@ -23,11 +23,8 @@ func NewAuthController(authService service.AuthService) AuthController {
 
 func (controller *AuthControllerImpl) LoginOrRegister(ctx *gin.Context) {
 	registerRequest := web.UserRegisterRequest{}
-
 	helper.ReadFromRequestBody(ctx.Request, &registerRequest)
-
 	registerResponse, err := controller.AuthService.LoginOrRegister(ctx, registerRequest)
-
 	// GET USER MENU
 	userMenu, _ := controller.AuthService.GetUserMenu(ctx, registerResponse.Role.Id)
 
@@ -62,11 +59,8 @@ func (controller *AuthControllerImpl) LoginOrRegister(ctx *gin.Context) {
 }
 
 func (controller *AuthControllerImpl) ForgotLinkPassword(ctx *gin.Context) {
-
 	forgotRequest := web.ForgotPasswordRequest{}
-
 	helper.ReadFromRequestBody(ctx.Request, &forgotRequest)
-
 	value, err := controller.AuthService.ForgotLinkPassword(ctx, forgotRequest)
 
 	var statusCode int
@@ -93,11 +87,8 @@ func (controller *AuthControllerImpl) ForgotLinkPassword(ctx *gin.Context) {
 }
 
 func (controller *AuthControllerImpl) ResetPasswordUser(ctx *gin.Context) {
-
 	passwordResetRequest := web.ResetPasswordRequest{}
-
 	helper.ReadFromRequestBody(ctx.Request, &passwordResetRequest)
-
 	err := controller.AuthService.ResetPasswordUser(ctx, passwordResetRequest)
 
 	var statusCode int
@@ -121,10 +112,8 @@ func (controller *AuthControllerImpl) ResetPasswordUser(ctx *gin.Context) {
 }
 
 func (controller *AuthControllerImpl) UpdateUserRole(ctx *gin.Context) {
-
 	requestUpdateUserAccess := web.UpdateUserAccessRequest{}
 	helper.ReadFromRequestBody(ctx.Request, &requestUpdateUserAccess)
-
 	responseUpdate, err := controller.AuthService.UpdateUserRole(ctx, requestUpdateUserAccess)
 
 	var statusCode int

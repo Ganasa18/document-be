@@ -27,12 +27,13 @@ func (repository *UserAccessRepositoryImpl) CreateUserAccess(ctx *gin.Context, u
 	err := repository.DB.Where(&domain.UserAccessMenuModel{RoleId: userAccess.RoleId, MenuId: userAccess.MenuId}).First(&userAccess).Error
 
 	if err != gorm.ErrRecordNotFound {
+		loghelper.Errorln(ctx, fmt.Sprintf("CreateUserAccess | UserAccessMenuModel | Repository | Error cannot duplicate insert, err:%s", err.Error()))
 		return userAccess, errors.New("cannot duplicate insert")
 	}
 
 	err = repository.DB.Model(&domain.UserAccessMenuModel{}).Create(&userAccess).Error
 	if err != nil {
-		loghelper.Errorln(ctx, fmt.Sprintf("CreateUserAccess | Error when Query builder create data, err:%s", err.Error()))
+		loghelper.Errorln(ctx, fmt.Sprintf("CreateUserAccess | UserAccessMenuModel | Repository | Error when Query builder create data, err:%s", err.Error()))
 		return userAccess, err
 	}
 
@@ -50,7 +51,7 @@ func (repository *UserAccessRepositoryImpl) GetAllUserAccess(ctx *gin.Context, p
 	err = queryBuilder.Model(&domain.UserAccessMenuModel{}).Preload("RoleMasterModel").Preload("MenuMasterModel").Where("deleted_at IS NULL").Find(&userAccess).Error
 
 	if err != nil {
-		loghelper.Errorln(ctx, fmt.Sprintf("GetAllUserAccess | Error when Query builder list data, err:%s", err.Error()))
+		loghelper.Errorln(ctx, fmt.Sprintf("GetAllUserAccess | UserAccessMenuModel | Repository | Error when Query builder list data, err:%s", err.Error()))
 		return userAccess, totalRow, err
 	}
 
@@ -60,7 +61,7 @@ func (repository *UserAccessRepositoryImpl) GetAllUserAccess(ctx *gin.Context, p
 	errCount := searchBuider.Count(&totalRow).Error
 
 	if errCount != nil {
-		loghelper.Errorln(ctx, fmt.Sprintf("GetAllUserAccess | Error when Query builder count total rows, err:%s", errCount.Error()))
+		loghelper.Errorln(ctx, fmt.Sprintf("GetAllUserAccess | UserAccessMenuModel | Repository | Error when Query builder count total rows, err:%s", errCount.Error()))
 		return userAccess, totalRow, errCount
 	}
 	return userAccess, totalRow, nil
@@ -69,7 +70,7 @@ func (repository *UserAccessRepositoryImpl) GetAllUserAccess(ctx *gin.Context, p
 func (repository *UserAccessRepositoryImpl) GetUserAccessById(ctx *gin.Context, id int) (userAccess domain.UserAccessMenuModel, err error) {
 	err = repository.DB.Model(&domain.UserAccessMenuModel{}).First(&userAccess, id).Error
 	if err != nil {
-		loghelper.Errorln(ctx, fmt.Sprintf("GetUserAccessById | Error when Query builder get data, err:%s", err.Error()))
+		loghelper.Errorln(ctx, fmt.Sprintf("GetUserAccessById | UserAccessMenuModel | Repository | Error when Query builder get data, err:%s", err.Error()))
 		return userAccess, errors.New("user access not found")
 	}
 	return userAccess, nil
@@ -100,13 +101,14 @@ func (repository *UserAccessRepositoryImpl) DeleteUserAccess(ctx *gin.Context, i
 	err := repository.DB.First(&domain.UserAccessMenuModel{}, id).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
+		loghelper.Errorln(ctx, fmt.Sprintf("DeleteUserAccess | UserAccessMenuModel | Repository | Error user access not found, err: %s", err.Error()))
 		return errors.New("user access not found")
 	}
 
 	err = repository.DB.Unscoped().Delete(userAccess).Error
 
 	if err != nil {
-		loghelper.Errorln(ctx, fmt.Sprintf("DeleteUserAccess | Error when deleting user access, err: %s", err.Error()))
+		loghelper.Errorln(ctx, fmt.Sprintf("DeleteUserAccess | UserAccessMenuModel | Repository | Error when deleting user access, err: %s", err.Error()))
 		return errors.New("failed to delete user access")
 	}
 
@@ -116,7 +118,7 @@ func (repository *UserAccessRepositoryImpl) DeleteUserAccess(ctx *gin.Context, i
 func (repository *UserAccessRepositoryImpl) checkIfUserAccessExists(ctx *gin.Context, id int) error {
 	err := repository.DB.First(&domain.UserAccessMenuModel{}, id).Error
 	if err != nil {
-		loghelper.Errorln(ctx, fmt.Sprintf("UpdateUserAccess | Error when querying data, err:%s", err.Error()))
+		loghelper.Errorln(ctx, fmt.Sprintf("checkIfUserAccessExists | UserAccessMenuModel | Repository | Error when querying data, err:%s", err.Error()))
 		return errors.New("user access not found")
 	}
 	return nil
@@ -130,7 +132,7 @@ func (repository *UserAccessRepositoryImpl) updateUserAccess(ctx *gin.Context, i
 		Where("id = ?", id).
 		Updates(updateFields).Error
 	if err != nil {
-		loghelper.Errorln(ctx, fmt.Sprintf("UpdateUserAccess | Error when updating data, err:%s", err.Error()))
+		loghelper.Errorln(ctx, fmt.Sprintf("UpdateUserAccess | UserAccessMenuModel | Repository | Error when updating data, err:%s", err.Error()))
 		return errors.New("failed to update user access")
 	}
 	return nil
@@ -139,7 +141,7 @@ func (repository *UserAccessRepositoryImpl) updateUserAccess(ctx *gin.Context, i
 func (repository *UserAccessRepositoryImpl) getUpdatedUserAccess(ctx *gin.Context, id int, userAccess *domain.UserAccessMenuModel) error {
 	err := repository.DB.First(userAccess, id).Error
 	if err != nil {
-		loghelper.Errorln(ctx, fmt.Sprintf("UpdateUserAccess | Error when querying updated data, err:%s", err.Error()))
+		loghelper.Errorln(ctx, fmt.Sprintf("getUpdatedUserAccess | UserAccessMenuModel | Repository | Error when querying updated data, err:%s", err.Error()))
 		return errors.New("failed to get updated user access")
 	}
 	return nil

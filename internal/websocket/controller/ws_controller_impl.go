@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -50,10 +51,12 @@ func (controller *WebSocketControllerImpl) HandlerWebSocketController(ctx *gin.C
 
 	clients[client] = true
 
+	fmt.Println(ctx.Request, "MESSAGE")
+
 	go handleClientMessages(client)
 
 	for {
-		messageType, p, err := conn.ReadMessage()
+		_, p, err := conn.ReadMessage()
 		if err != nil {
 			log.Println("Error reading message:", err)
 			delete(clients, client)
@@ -64,7 +67,13 @@ func (controller *WebSocketControllerImpl) HandlerWebSocketController(ctx *gin.C
 		message := string(p)
 		broadcast <- message
 
-		fmt.Println(messageType, "MESSAGE TYPE SERVER")
+		var request WebSocketMessage
+		if err := json.Unmarshal(p, &request); err != nil {
+			// Handle error
+			fmt.Println("Error unmarshalling JSON:", err)
+			continue
+		}
+		fmt.Println(request.Type, "REQUEST TYPE")
 		log.Printf("Received message: %s\n", p)
 
 	}

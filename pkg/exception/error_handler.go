@@ -3,24 +3,21 @@ package exception
 import (
 	"fmt"
 	"net/http"
-	"regexp"
-	"runtime/debug"
-	"strings"
+	"time"
 
 	"github.com/Ganasa18/document-be/internal/base/model/web"
 	"github.com/Ganasa18/document-be/pkg/helper"
 	"github.com/Ganasa18/document-be/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"github.com/sirupsen/logrus"
 )
 
 func ExceptionRecoveryMiddleware(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
 			fmt.Println("Panic recovered:", err)
-			debug.PrintStack()
 			handleError(c, err)
-
 			c.Abort()
 		}
 	}()
@@ -44,12 +41,6 @@ type ValidationError struct {
 	FieldName string `json:"field_name"`
 }
 
-func camelToSnake(input string) string {
-	regex := regexp.MustCompile("([a-z0-9])([A-Z])")
-	snake := regex.ReplaceAllString(input, "${1}_${2}")
-	return strings.ToLower(snake)
-}
-
 func validationErrors(ctx *gin.Context, err interface{}) bool {
 	exception, ok := err.(validator.ValidationErrors)
 
@@ -60,14 +51,16 @@ func validationErrors(ctx *gin.Context, err interface{}) bool {
 		errorArray := make([]ValidationError, len(exception))
 		for i, fieldError := range exception {
 			errorArray[i] = ValidationError{
-				FieldName: "Field " + camelToSnake(fieldError.Field()) + " " + fieldError.Tag() + " error",
+				FieldName: "Field " + helper.CamelToSnake(fieldError.Field()) + " " + fieldError.Tag() + " error",
 			}
 		}
+
 		webResponse := web.WebResponse{
 			Code:   http.StatusBadRequest,
 			Status: "BAD REQUEST",
 			Data:   map[string]interface{}{"errors": errorArray},
 		}
+		logrus.Errorln(fmt.Sprintf("METHOD: %s, URL: %s, message: %s", ctx.Request.Method, ctx.Request.URL, errorArray))
 		helper.WriteToResponseBody(ctx, http.StatusBadRequest, webResponse)
 		return true
 	} else {
@@ -75,6 +68,7 @@ func validationErrors(ctx *gin.Context, err interface{}) bool {
 	}
 }
 func notFoundError(ctx *gin.Context, err interface{}) bool {
+	start := time.Now()
 	exception, ok := err.(NotFoundError)
 	if ok {
 		ctx.Writer.Header().Set(utils.HEADER_CONTENT_TYPE, utils.CONTENT_TYPE_APPLICATION_JSON)
@@ -84,7 +78,8 @@ func notFoundError(ctx *gin.Context, err interface{}) bool {
 			Status: "NOT FOUND",
 			Data:   exception.Error,
 		}
-
+		end := time.Since(start)
+		logrus.Infoln(fmt.Sprintf("METHOD: %s, URL: %s, RESPONSE: %s , LATENCY: %vms", ctx.Request.Method, ctx.Request.URL, exception.Error, end.Milliseconds()))
 		helper.WriteToResponseBody(ctx, http.StatusNotFound, webResponse)
 		return true
 	} else {
@@ -93,6 +88,7 @@ func notFoundError(ctx *gin.Context, err interface{}) bool {
 }
 
 func internalServerError(ctx *gin.Context, err interface{}) {
+	start := time.Now()
 	ctx.Writer.Header().Set(utils.HEADER_CONTENT_TYPE, utils.CONTENT_TYPE_APPLICATION_JSON)
 	ctx.Writer.WriteHeader(http.StatusInternalServerError)
 	webResponse := web.WebResponse{
@@ -100,6 +96,7 @@ func internalServerError(ctx *gin.Context, err interface{}) {
 		Status: "INTERNAL SERVER ERROR",
 		Data:   err,
 	}
-
+	end := time.Since(start)
+	logrus.Infoln(fmt.Sprintf("METHOD: %s, URL: %s, RESPONSE: %s , LATENCY: %vms", ctx.Request.Method, ctx.Request.URL, err, end.Milliseconds()))
 	helper.WriteToResponseBody(ctx, http.StatusInternalServerError, webResponse)
 }

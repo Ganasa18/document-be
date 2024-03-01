@@ -29,12 +29,13 @@ func (repository *RoleRepositoryImpl) CreateRole(ctx context.Context, role domai
 	err := repository.DB.Where(&domain.RoleMasterModel{RoleName: RoleName}).First(&role).Error
 
 	if err != gorm.ErrRecordNotFound {
+		loghelper.Errorln(ctx, fmt.Sprintf("CreateRole | RoleMasterModel | Repository | Error cannot duplicate insert, err:%s", err.Error()))
 		return role, errors.New("cannot duplicate insert")
 	}
 
 	err = repository.DB.Model(&domain.RoleMasterModel{}).Create(&role).Error
 	if err != nil {
-		loghelper.Errorln(ctx, fmt.Sprintf("CreateRole | Error when Query builder create data, err:%s", err.Error()))
+		loghelper.Errorln(ctx, fmt.Sprintf("CreateRole | RoleMasterModel | Repository | Error when Query builder create data, err:%s", err.Error()))
 		return role, err
 	}
 
@@ -45,21 +46,21 @@ func (repository *RoleRepositoryImpl) UpdateRole(ctx context.Context, role domai
 	// Check if the role with the given ID exists
 	err := repository.DB.First(&domain.RoleMasterModel{}, id).Error
 	if err != nil {
-		loghelper.Errorln(ctx, fmt.Sprintf("UpdateRole | Error when querying data, err:%s", err.Error()))
+		loghelper.Errorln(ctx, fmt.Sprintf("UpdateRole | RoleMasterModel | Repository | Error when querying data, err:%s", err.Error()))
 		return role, errors.New("role not found")
 	}
 
 	// Update the role_name for the role with the given ID
 	err = repository.DB.Model(&domain.RoleMasterModel{}).Where("id = ?", id).Updates(map[string]interface{}{"role_name": role.RoleName}).Error
 	if err != nil {
-		loghelper.Errorln(ctx, fmt.Sprintf("UpdateRole | Error when updating data, err:%s", err.Error()))
+		loghelper.Errorln(ctx, fmt.Sprintf("UpdateRole | RoleMasterModel | Repository | Error when updating data, err:%s", err.Error()))
 		return role, errors.New("failed to update role")
 	}
 
 	// Retrieve the updated role
 	err = repository.DB.First(&role, id).Error
 	if err != nil {
-		loghelper.Errorln(ctx, fmt.Sprintf("UpdateRole | Error when querying updated data, err:%s", err.Error()))
+		loghelper.Errorln(ctx, fmt.Sprintf("UpdateRole | RoleMasterModel | Repository | Error when querying updated data, err:%s", err.Error()))
 		return role, errors.New("failed to get updated role")
 	}
 
@@ -72,13 +73,14 @@ func (repository *RoleRepositoryImpl) DeleteRole(ctx context.Context, id int) er
 	err := repository.DB.First(&domain.RoleMasterModel{}, id).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
+		loghelper.Errorln(ctx, fmt.Sprintf("DeleteRole | RoleMasterModel | Repository | Error role not found, err: %s", err.Error()))
 		return errors.New("role not found")
 	}
 
 	err = repository.DB.Delete(role).Error
 
 	if err != nil {
-		loghelper.Errorln(ctx, fmt.Sprintf("DeleteRole | Error when deleting role, err: %s", err.Error()))
+		loghelper.Errorln(ctx, fmt.Sprintf("DeleteRole | RoleMasterModel | Repository | Error when deleting role, err: %s", err.Error()))
 		return errors.New("failed to delete role")
 	}
 
@@ -88,7 +90,7 @@ func (repository *RoleRepositoryImpl) DeleteRole(ctx context.Context, id int) er
 func (repository *RoleRepositoryImpl) GetRoleById(ctx context.Context, id int) (role domain.RoleMasterModel, err error) {
 	err = repository.DB.Model(&domain.RoleMasterModel{}).First(&role, id).Error
 	if err != nil {
-		loghelper.Errorln(ctx, fmt.Sprintf("GetRoleById | Error when Query builder get data, err:%s", err.Error()))
+		loghelper.Errorln(ctx, fmt.Sprintf("GetRoleById | RoleMasterModel | Repository | Error when Query builder get data, err:%s", err.Error()))
 		return role, errors.New("role not found")
 	}
 	return role, nil
@@ -109,7 +111,7 @@ func (repository *RoleRepositoryImpl) GetRoles(ctx context.Context, pagination *
 	err = queryBuilder.Model(&domain.RoleMasterModel{}).Where("deleted_at IS NULL").Find(&roles).Error
 
 	if err != nil {
-		loghelper.Errorln(ctx, fmt.Sprintf("FindAll | Error when Query builder list data, err:%s", err.Error()))
+		loghelper.Errorln(ctx, fmt.Sprintf("FindAll | RoleMasterModel | Repository | Error when Query builder list data, err:%s", err.Error()))
 		return roles, totalRow, err
 	}
 
@@ -121,7 +123,7 @@ func (repository *RoleRepositoryImpl) GetRoles(ctx context.Context, pagination *
 	errCount := searchBuider.Count(&totalRow).Error
 
 	if errCount != nil {
-		loghelper.Errorln(ctx, fmt.Sprintf("FindAll | Error when Query builder count total rows, err:%s", errCount.Error()))
+		loghelper.Errorln(ctx, fmt.Sprintf("FindAll | RoleMasterModel | Repository | Error when Query builder count total rows, err:%s", errCount.Error()))
 		return roles, totalRow, errCount
 	}
 	return roles, totalRow, nil
