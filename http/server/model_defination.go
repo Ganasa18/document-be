@@ -7,6 +7,7 @@ import (
 	crudController "github.com/Ganasa18/document-be/internal/crud/controller"
 	crudRepository "github.com/Ganasa18/document-be/internal/crud/repository"
 	crudService "github.com/Ganasa18/document-be/internal/crud/service"
+	loggingRepository "github.com/Ganasa18/document-be/internal/logging/repository"
 	wsController "github.com/Ganasa18/document-be/internal/websocket/controller"
 	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
@@ -14,8 +15,10 @@ import (
 
 func InitializeModel(db *gorm.DB, validate *validator.Validate) (authController.AuthController, crudController.RoleController, crudController.MenuController, crudController.UserAccessController, wsController.WebSocketController) {
 	// Auth module
+
 	authRepo := authRepository.NewAuthRepository(db)
-	authSvc := authService.NewAuthService(authRepo, validate)
+	logRepo := loggingRepository.NewLoggingRepository(db)
+	authSvc := authService.NewAuthService(authRepo, logRepo, validate)
 	authCtrl := authController.NewAuthController(authSvc)
 
 	// Role module

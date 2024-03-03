@@ -12,6 +12,8 @@ import (
 	"github.com/Ganasa18/document-be/internal/auth/model/web"
 	"github.com/Ganasa18/document-be/internal/auth/repository"
 	crud "github.com/Ganasa18/document-be/internal/crud/model/web"
+	logDomain "github.com/Ganasa18/document-be/internal/logging/model/domain"
+	logRepository "github.com/Ganasa18/document-be/internal/logging/repository"
 	"github.com/Ganasa18/document-be/pkg/email"
 	"github.com/Ganasa18/document-be/pkg/exception"
 	"github.com/Ganasa18/document-be/pkg/helper"
@@ -25,14 +27,16 @@ import (
 )
 
 type AuthServiceImpl struct {
-	AuthRepository repository.AuthRepository
-	Validate       *validator.Validate
+	AuthRepository    repository.AuthRepository
+	LoggingRepository logRepository.LoggingRepository
+	Validate          *validator.Validate
 }
 
-func NewAuthService(authRepository repository.AuthRepository, validate *validator.Validate) AuthService {
+func NewAuthService(authRepository repository.AuthRepository, loggingRepository logRepository.LoggingRepository, validate *validator.Validate) AuthService {
 	return &AuthServiceImpl{
-		AuthRepository: authRepository,
-		Validate:       validate,
+		AuthRepository:    authRepository,
+		LoggingRepository: loggingRepository,
+		Validate:          validate,
 	}
 }
 
@@ -84,6 +88,14 @@ func (service *AuthServiceImpl) LoginOrRegister(ctx *gin.Context, request web.Us
 
 	profileRes, errProfile := service.AuthRepository.CreateOrGetProfile(ctx, profile)
 	utils.PanicIfError(errProfile)
+	// Logging Login
+	login := logDomain.LoginLogModel{
+		Agent:  ctx.Request.UserAgent(),
+		Email:  request.Email,
+		Action: "login",
+	}
+	errLog := service.LoggingRepository.AddLoginLogging(ctx, login)
+	utils.PanicIfError(errLog)
 
 	return web.ToUserBaseResponse(data, profileRes, err)
 
@@ -204,8 +216,6 @@ func (service *AuthServiceImpl) UpdateUserRole(ctx *gin.Context, request web.Upd
 	}
 
 	data, err := service.AuthRepository.UpdateUserRole(ctx, user, adminToken)
-
-	fmt.Println(data, "SERVICE DATA")
 
 	return web.ToUserResponse(data, err)
 }

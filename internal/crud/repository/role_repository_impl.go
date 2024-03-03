@@ -1,14 +1,13 @@
 package repository
 
 import (
-	"context"
 	"errors"
-	"fmt"
 	"strings"
 
 	"github.com/Ganasa18/document-be/internal/crud/model/domain"
 	"github.com/Ganasa18/document-be/pkg/helper"
 	"github.com/Ganasa18/document-be/pkg/loghelper"
+	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
@@ -22,81 +21,81 @@ func NewRoleRepository(db *gorm.DB) RoleRepository {
 	}
 }
 
-func (repository *RoleRepositoryImpl) CreateRole(ctx context.Context, role domain.RoleMasterModel) (domain.RoleMasterModel, error) {
+func (repository *RoleRepositoryImpl) CreateRole(ctx *gin.Context, role domain.RoleMasterModel) (domain.RoleMasterModel, error) {
 
 	RoleName := strings.ToLower(role.RoleName)
 	// Check existing role
 	err := repository.DB.Where(&domain.RoleMasterModel{RoleName: RoleName}).First(&role).Error
 
 	if err != gorm.ErrRecordNotFound {
-		loghelper.Errorln(ctx, fmt.Sprintf("CreateRole | RoleMasterModel | Repository | Error cannot duplicate insert, err:%s", err.Error()))
+		loghelper.LogErrorRepository(ctx, "CreateRole", "RoleMasterModel", "cannot duplicate insert", err)
 		return role, errors.New("cannot duplicate insert")
 	}
 
 	err = repository.DB.Model(&domain.RoleMasterModel{}).Create(&role).Error
 	if err != nil {
-		loghelper.Errorln(ctx, fmt.Sprintf("CreateRole | RoleMasterModel | Repository | Error when Query builder create data, err:%s", err.Error()))
+		loghelper.LogErrorRepository(ctx, "CreateRole", "RoleMasterModel", "when query builder create data", err)
 		return role, err
 	}
 
 	return role, nil
 }
 
-func (repository *RoleRepositoryImpl) UpdateRole(ctx context.Context, role domain.RoleMasterModel, id int) (domain.RoleMasterModel, error) {
+func (repository *RoleRepositoryImpl) UpdateRole(ctx *gin.Context, role domain.RoleMasterModel, id int) (domain.RoleMasterModel, error) {
 	// Check if the role with the given ID exists
 	err := repository.DB.First(&domain.RoleMasterModel{}, id).Error
 	if err != nil {
-		loghelper.Errorln(ctx, fmt.Sprintf("UpdateRole | RoleMasterModel | Repository | Error when querying data, err:%s", err.Error()))
+		loghelper.LogErrorRepository(ctx, "UpdateRole", "RoleMasterModel", "when querying data", err)
 		return role, errors.New("role not found")
 	}
 
 	// Update the role_name for the role with the given ID
 	err = repository.DB.Model(&domain.RoleMasterModel{}).Where("id = ?", id).Updates(map[string]interface{}{"role_name": role.RoleName}).Error
 	if err != nil {
-		loghelper.Errorln(ctx, fmt.Sprintf("UpdateRole | RoleMasterModel | Repository | Error when updating data, err:%s", err.Error()))
+		loghelper.LogErrorRepository(ctx, "UpdateRole", "RoleMasterModel", "when updating data", err)
 		return role, errors.New("failed to update role")
 	}
 
 	// Retrieve the updated role
 	err = repository.DB.First(&role, id).Error
 	if err != nil {
-		loghelper.Errorln(ctx, fmt.Sprintf("UpdateRole | RoleMasterModel | Repository | Error when querying updated data, err:%s", err.Error()))
+		loghelper.LogErrorRepository(ctx, "UpdateRole", "RoleMasterModel", "when querying updated data", err)
 		return role, errors.New("failed to get updated role")
 	}
 
 	return role, err
 }
 
-func (repository *RoleRepositoryImpl) DeleteRole(ctx context.Context, id int) error {
+func (repository *RoleRepositoryImpl) DeleteRole(ctx *gin.Context, id int) error {
 	role := &domain.RoleMasterModel{Id: id}
 
 	err := repository.DB.First(&domain.RoleMasterModel{}, id).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		loghelper.Errorln(ctx, fmt.Sprintf("DeleteRole | RoleMasterModel | Repository | Error role not found, err: %s", err.Error()))
+		loghelper.LogErrorRepository(ctx, "DeleteRole", "RoleMasterModel", "role not found", err)
 		return errors.New("role not found")
 	}
 
 	err = repository.DB.Delete(role).Error
 
 	if err != nil {
-		loghelper.Errorln(ctx, fmt.Sprintf("DeleteRole | RoleMasterModel | Repository | Error when deleting role, err: %s", err.Error()))
+		loghelper.LogErrorRepository(ctx, "DeleteRole", "RoleMasterModel", "when deleting role", err)
 		return errors.New("failed to delete role")
 	}
 
 	return nil
 }
 
-func (repository *RoleRepositoryImpl) GetRoleById(ctx context.Context, id int) (role domain.RoleMasterModel, err error) {
+func (repository *RoleRepositoryImpl) GetRoleById(ctx *gin.Context, id int) (role domain.RoleMasterModel, err error) {
 	err = repository.DB.Model(&domain.RoleMasterModel{}).First(&role, id).Error
 	if err != nil {
-		loghelper.Errorln(ctx, fmt.Sprintf("GetRoleById | RoleMasterModel | Repository | Error when Query builder get data, err:%s", err.Error()))
+		loghelper.LogErrorRepository(ctx, "GetRoleById", "RoleMasterModel", "when query builder get data", err)
 		return role, errors.New("role not found")
 	}
 	return role, nil
 }
 
-func (repository *RoleRepositoryImpl) GetRoles(ctx context.Context, pagination *helper.PaginationInput) (roles []domain.RoleMasterModel, totalRow int64, err error) {
+func (repository *RoleRepositoryImpl) GetRoles(ctx *gin.Context, pagination *helper.PaginationInput) (roles []domain.RoleMasterModel, totalRow int64, err error) {
 
 	totalRow = 0
 
@@ -111,7 +110,7 @@ func (repository *RoleRepositoryImpl) GetRoles(ctx context.Context, pagination *
 	err = queryBuilder.Model(&domain.RoleMasterModel{}).Where("deleted_at IS NULL").Find(&roles).Error
 
 	if err != nil {
-		loghelper.Errorln(ctx, fmt.Sprintf("FindAll | RoleMasterModel | Repository | Error when Query builder list data, err:%s", err.Error()))
+		loghelper.LogErrorRepository(ctx, "FindAll", "RoleMasterModel", "when query builder list data", err)
 		return roles, totalRow, err
 	}
 
@@ -123,7 +122,7 @@ func (repository *RoleRepositoryImpl) GetRoles(ctx context.Context, pagination *
 	errCount := searchBuider.Count(&totalRow).Error
 
 	if errCount != nil {
-		loghelper.Errorln(ctx, fmt.Sprintf("FindAll | RoleMasterModel | Repository | Error when Query builder count total rows, err:%s", errCount.Error()))
+		loghelper.LogErrorRepository(ctx, "FindAll", "RoleMasterModel", "when query builder count total rows", err)
 		return roles, totalRow, errCount
 	}
 	return roles, totalRow, nil
